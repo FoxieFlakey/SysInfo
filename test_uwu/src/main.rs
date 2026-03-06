@@ -6,6 +6,7 @@ fn main() {
   
   let sample = sysinfo.cpu_usage.data.samples.front().unwrap().as_ref().unwrap();
   let swaps = sysinfo.swap_usage.data.samples.front().unwrap().as_ref().unwrap();
+  let memory = sysinfo.memory_usage.data.samples.front().unwrap().as_ref().unwrap();
   
   println!("Utilization: {}%", sample.utilization * 100.0);
   println!("Frequency: {} Mhz", sample.frequency_khz / 1000.0);
@@ -54,5 +55,38 @@ fn main() {
     println!("   Used: {:8.2} MiB", dev.used_kib / 1024.0);
     println!("   Size: {:8.2} MiB", dev.size_kib / 1024.0);
   }
+  
+  println!("System's memory state:");
+  let used = (memory.mem_total_kib - memory.mem_free_kib) / 1024.0;
+  let total = memory.mem_total_kib / 1024.0;
+  let non_cache_or_buffer = used - (memory.buffers_kib + memory.cached_kib) / 1024.0;
+  let cached = (memory.cached_kib + memory.slab_reclaimable_kib - memory.shmem_kib) / 1024.0;
+  let buffers = memory.buffers_kib / 1024.0;
+  let free = memory.mem_free_kib / 1024.0;
+  let shmem = memory.shmem_kib / 1024.0;
+  let writeback = memory.writeback_kib / 1024.0;
+  let mapped = memory.mapped_kib / 1024.0;024.0;
+  let dirty = memory.dirty_kib / 1024.0;
+  let available = memory.mem_available_kib / 1024.0;
+  let anonymous_memory = memory.anon_pages_kib / 1024.0;
+  
+  println!("Total memory      : {:12.2} MiB", total);
+  println!("Free              : {:12.2} MiB", free);
+  println!("Used              : {:12.2} MiB", used);
+  println!("Non cache/buffers : {:12.2} MiB", non_cache_or_buffer);
+  println!("Cached            : {:12.2} MiB", cached);
+  println!("Buffers           : {:12.2} MiB", buffers);
+  println!("Shmem             : {:12.2} MiB", shmem);
+  println!("Writeback         : {:12.2} MiB", writeback);
+  println!("Dirty             : {:12.2} MiB", dirty);
+  println!("Available         : {:12.2} MiB", available);
+  println!("File mapped       : {:12.2} MiB", mapped);
+  println!("Anonymous mem     : {:12.2} MiB", anonymous_memory);
+  
+  println!("Simpler summary of memory state:");
+  println!("Used      : {:12.2} MiB", non_cache_or_buffer + shmem + buffers);
+  println!("Cache     : {:12.2} MiB", cached);
+  println!("Writeback : {:12.2} MiB (pending to written to disk)", writeback);
+  println!("Available : {:12.2} MiB", available);
 }
 
