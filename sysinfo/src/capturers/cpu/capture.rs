@@ -1,21 +1,34 @@
-use std::{collections::HashMap, iter::Peekable, ops::Range, path::{Path, PathBuf}};
+use std::{collections::HashMap, iter::Peekable, ops::Range, path::{Path, PathBuf}, time::Instant};
 
 use arrayvec::ArrayString;
 
-use crate::{capturers::cpu::{CPU, Cluster, Core, Die, Socket, Thread}, metric::Capturer, util};
+use crate::{capturers::cpu::{CPU, Cluster, Core, Die, Socket, Thread, stat::ProcStat}, metric::Capturer, util};
 
-pub struct CpuCapture;
+pub struct CpuCapture {
+  prev_stat: Option<(Instant, ProcStat)>
+}
 
 impl CpuCapture {
   pub fn new() -> Self {
-    Self
+    Self {
+      prev_stat: None
+    }
   }
 }
 
 impl Capturer for CpuCapture {
   type Sample = CPU;
   
+  fn prep_capture(&mut self) {
+    self.prev_stat = ProcStat::capture()
+      .map(|x| (Instant::now(), x));
+  }
+  
   fn capture(&mut self) -> Option<Self::Sample> {
+    let (start_time, prev_stat) = self.prev_stat.take()?;
+    let current_stat = ProcStat::capture()?;
+    let duration = start_time.elapsed().as_secs_f64();
+    
     // There mutliple files under there
     // /sys/devices/system/cpu/online mean CPUs that is online
     // /sys/devices/system/cpu/offline mean CPUs that is offline
@@ -57,6 +70,19 @@ impl Capturer for CpuCapture {
         // On some CPU, the 'online' file didnt exists, it usually meant the cpu can't be taken offline
         // so its always online
         let is_online = read_integer(&base.join("online")).unwrap_or(1) != 0;
+        
+        let prev_time = prev_stat.cpus.get(id as usize)
+          .cloned()
+          .unwrap_or_default()
+          .combine_all_active() as f64 * (1.0 / util::get_clock_tick_speed() as f64);
+        
+        let cur_time = current_stat.cpus.get(id as usize)
+          .cloned()
+          .unwrap_or_default()
+          .combine_all_active() as f64 * (1.0 / util::get_clock_tick_speed() as f64);
+        
+        let time_active = cur_time - prev_time;
+        let utilization = time_active / duration;
         
         let physical_package_id = read_integer(&base.join("topology/physical_package_id"))?;
         let die_id = read_integer(&base.join("topology/die_id"))?;
@@ -112,7 +138,7 @@ impl Capturer for CpuCapture {
         core.threads.push(Thread {
           frequency_khz: f64::from(cur_freq),
           online_percent: if is_online { 1.0 } else { 0.0 },
-          utilization: 0.0
+          utilization
         });
       }
     }

@@ -8,6 +8,8 @@ mod core;
 mod thread;
 mod capture;
 mod die;
+mod stat;
+
 pub use {socket::Socket, cluster::Cluster, core::Core, thread::Thread, capture::CpuCapture, die::Die};
 
 #[derive(Clone)]
