@@ -166,6 +166,11 @@ fn parse_list(cpu_list: &str) -> Option<Vec<CPUEntry>> {
   let mut iter = cpu_list.chars().fuse().peekable();
   let mut list = Vec::new();
   
+  // Its empty entry
+  if let Some('\n') = iter.peek() {
+    return Some(list);
+  }
+  
   loop {
     list.push(CPUEntry::parse(&mut iter)?);
     
