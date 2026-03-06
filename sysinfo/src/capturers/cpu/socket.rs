@@ -10,6 +10,24 @@ pub struct Socket {
 }
 
 impl Socket {
+  pub(crate) fn do_max_on_all_fields(&mut self, rhs: &Self) {
+    self.frequency_khz = f64::max(self.frequency_khz, rhs.frequency_khz);
+    self.utilization = f64::max(self.utilization, rhs.utilization);
+    
+    self.dies.iter_mut()
+      .zip(rhs.dies.iter())
+      .for_each(|(rhs, lhs)| rhs.do_max_on_all_fields(lhs));
+  }
+  
+  pub(crate) fn do_min_on_all_fields(&mut self, rhs: &Self) {
+    self.frequency_khz = f64::min(self.frequency_khz, rhs.frequency_khz);
+    self.utilization = f64::min(self.utilization, rhs.utilization);
+    
+    self.dies.iter_mut()
+      .zip(rhs.dies.iter())
+      .for_each(|(rhs, lhs)| rhs.do_min_on_all_fields(lhs));
+  }
+  
   pub(crate) fn sanify(&mut self) {
     self.dies.iter_mut().for_each(Die::sanify);
     self.utilization = self.dies.iter()

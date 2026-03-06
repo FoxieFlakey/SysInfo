@@ -10,6 +10,24 @@ pub struct Cluster {
 }
 
 impl Cluster {
+  pub(crate) fn do_max_on_all_fields(&mut self, rhs: &Self) {
+    self.frequency_khz = f64::max(self.frequency_khz, rhs.frequency_khz);
+    self.utilization = f64::max(self.utilization, rhs.utilization);
+    
+    self.cores.iter_mut()
+      .zip(rhs.cores.iter())
+      .for_each(|(rhs, lhs)| rhs.do_max_on_all_fields(lhs));
+  }
+  
+  pub(crate) fn do_min_on_all_fields(&mut self, rhs: &Self) {
+    self.frequency_khz = f64::min(self.frequency_khz, rhs.frequency_khz);
+    self.utilization = f64::min(self.utilization, rhs.utilization);
+    
+    self.cores.iter_mut()
+      .zip(rhs.cores.iter())
+      .for_each(|(rhs, lhs)| rhs.do_min_on_all_fields(lhs));
+  }
+  
   pub fn sanify(&mut self) {
     self.cores.iter_mut().for_each(Core::sanify);
     self.utilization = self.cores.iter()

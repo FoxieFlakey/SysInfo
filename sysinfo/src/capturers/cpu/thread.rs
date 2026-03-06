@@ -13,6 +13,18 @@ pub struct Thread {
   pub frequency_khz: f64
 }
 
+impl Thread {
+  pub(crate) fn do_max_on_all_fields(&mut self, rhs: &Self) {
+    self.frequency_khz = f64::max(self.frequency_khz, rhs.frequency_khz);
+    self.utilization = f64::max(self.utilization, rhs.utilization);
+  }
+  
+  pub(crate) fn do_min_on_all_fields(&mut self, rhs: &Self) {
+    self.frequency_khz = f64::min(self.frequency_khz, rhs.frequency_khz);
+    self.utilization = f64::min(self.utilization, rhs.utilization);
+  }
+}
+
 impl<'a> AddAssign<&'a Self> for Thread {
   fn add_assign(&mut self, rhs: &'a Self) {
     self.utilization += rhs.utilization;

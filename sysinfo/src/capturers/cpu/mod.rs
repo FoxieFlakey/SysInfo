@@ -101,11 +101,19 @@ impl Sample<'_> for CPU {
   fn do_max_on_all_fields(&mut self, rhs: &Self) {
     self.frequency_khz = f64::max(self.frequency_khz, rhs.frequency_khz);
     self.utilization = f64::max(self.utilization, rhs.utilization);
+    
+    self.sockets.iter_mut()
+      .zip(rhs.sockets.iter())
+      .for_each(|(rhs, lhs)| rhs.do_max_on_all_fields(lhs));
   }
   
   fn do_min_on_all_fields(&mut self, rhs: &Self) {
     self.frequency_khz = f64::min(self.frequency_khz, rhs.frequency_khz);
     self.utilization = f64::min(self.utilization, rhs.utilization);
+    
+    self.sockets.iter_mut()
+      .zip(rhs.sockets.iter())
+      .for_each(|(rhs, lhs)| rhs.do_min_on_all_fields(lhs));
   }
 }
 
