@@ -13,7 +13,7 @@ impl SwapCapture {
 impl Capturer for SwapCapture {
   type Sample = Swaps;
   
-  fn capture(&self) -> Option<Self::Sample> {
+  fn capture(&mut self) -> Option<Self::Sample> {
     let file = File::open(Path::new("/proc/swaps")).ok()?;
     let mut lines = BufReader::new(file).lines();
     

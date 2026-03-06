@@ -3,7 +3,10 @@ use std::{collections::VecDeque, ops::{AddAssign, DivAssign, SubAssign}};
 pub trait Capturer: Send + Sync {
   type Sample: for <'a> self::Sample<'a>;
   
-  fn capture(&self) -> Option<Self::Sample>;
+  fn prep_capture(&mut self) {
+  }
+  
+  fn capture(&mut self) -> Option<Self::Sample>;
 }
 
 // A metric value, it requires to implements
@@ -73,6 +76,10 @@ impl<Capturer: self::Capturer> Metric<Capturer> {
         delta: None
       }
     }
+  }
+  
+  pub fn prep_update(&mut self) {
+    self.capturer.prep_capture();
   }
   
   pub fn update(&mut self) -> Option<Capturer::Sample> {

@@ -15,7 +15,7 @@ impl CpuCapture {
 impl Capturer for CpuCapture {
   type Sample = CPU;
   
-  fn capture(&self) -> Option<Self::Sample> {
+  fn capture(&mut self) -> Option<Self::Sample> {
     // There mutliple files under there
     // /sys/devices/system/cpu/online mean CPUs that is online
     // /sys/devices/system/cpu/offline mean CPUs that is offline

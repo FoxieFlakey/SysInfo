@@ -2,6 +2,8 @@ mod metric;
 mod capturers;
 mod util;
 
+use std::{thread, time::Duration};
+
 use metric::Metric;
 
 use crate::capturers::{cpu::CpuCapture, swap::SwapCapture};
@@ -20,6 +22,11 @@ impl SysInfo {
   }
   
   pub fn update(&mut self) {
+    self.cpu_usage.prep_update();
+    self.swap_usage.prep_update();
+    
+    thread::sleep(Duration::from_millis(500));
+    
     self.cpu_usage.update();
     self.swap_usage.update();
   }
