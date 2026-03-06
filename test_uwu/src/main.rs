@@ -16,28 +16,28 @@ fn main() {
   println!("Sockets:");
   for (i, socket) in sample.sockets.iter().enumerate() {
     println!(" - Socket {i}");
-    println!("   Utilization: {}%", socket.utilization * 100.0);
+    println!("   Utilization: {:5.2}%", socket.utilization * 100.0);
     println!("   Frequency: {} Mhz", socket.frequency_khz / 1000.0);
     println!("   Clusters:");
     for (i, die) in socket.dies.iter().enumerate() {
       println!("   - Die {i}");
-      println!("     Utilization: {}%", die.utilization * 100.0);
+      println!("     Utilization: {:5.2}%", die.utilization * 100.0);
       println!("     Frequency: {} Mhz", die.frequency_khz / 1000.0);
       println!("     Clusters:");
       for (i, cluster) in die.clusters.iter().enumerate() {
         println!("     - Cluster {i}");
-        println!("       Utilization: {}%", cluster.utilization * 100.0);
+        println!("       Utilization: {:5.2}%", cluster.utilization * 100.0);
         println!("       Frequency: {} Mhz", cluster.frequency_khz / 1000.0);
         println!("       Cores:");
         for (i, core) in cluster.cores.iter().enumerate() {
           println!("       - Core {i}");
-          println!("         Utilization: {}%", core.utilization * 100.0);
+          println!("         Utilization: {:5.2}%", core.utilization * 100.0);
           println!("         Frequency: {} Mhz", core.frequency_khz / 1000.0);
           println!("         Threads:");
           for (i, thread) in core.threads.iter().enumerate() {
             println!("         - Hw thread {i}");
-            println!("           Online percent: {}%", thread.online_percent * 100.0);
-            println!("           Utilization: {}%", thread.utilization * 100.0);
+            println!("           Online percent: {:5.2}%", thread.online_percent * 100.0);
+            println!("           Utilization: {:5.2}%", thread.utilization * 100.0);
             println!("           Frequency: {} Mhz", thread.frequency_khz / 1000.0);
           }
         }
@@ -46,13 +46,13 @@ fn main() {
   }
   
   println!("Swap in system:");
-  println!("Total size: {} MiB", swaps.total_size_kib / 1024.0);
-  println!("Total used: {} MiB", swaps.total_used_kib / 1024.0);
+  println!("Total size: {:8.2} MiB", swaps.total_size_kib / 1024.0);
+  println!("Total used: {:8.2} MiB", swaps.total_used_kib / 1024.0);
   println!("Swap devices:");
   for dev in &swaps.swaps {
     println!(" - Swap at {}", dev.path);
-    println!("   Used: {} MiB", dev.used_kib / 1024.0);
-    println!("   Size: {} MiB", dev.size_kib / 1024.0);
+    println!("   Used: {:8.2} MiB", dev.used_kib / 1024.0);
+    println!("   Size: {:8.2} MiB", dev.size_kib / 1024.0);
   }
 }
 
