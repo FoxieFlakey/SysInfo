@@ -7,6 +7,7 @@ fn main() {
   let sample = sysinfo.cpu_usage.data.samples.front().unwrap().as_ref().unwrap();
   let swaps = sysinfo.swap_usage.data.samples.front().unwrap().as_ref().unwrap();
   let memory = sysinfo.memory_usage.data.samples.front().unwrap().as_ref().unwrap();
+  let loadavg = sysinfo.loadavg.data.samples.front().unwrap().as_ref().unwrap();
   
   println!("Utilization: {:5.2}%", sample.utilization * 100.0);
   println!("Frequency: {:5.2} Mhz", sample.frequency_khz / 1000.0);
@@ -88,5 +89,12 @@ fn main() {
   println!("Cache     : {:12.2} MiB", cached);
   println!("Writeback : {:12.2} MiB (pending to written to disk)", writeback);
   println!("Available : {:12.2} MiB", available);
+  
+  println!("System loadavg:");
+  println!("1  minute     : {:8.2}", loadavg.load_1m);
+  println!("5  minute     : {:8.2}", loadavg.load_5m);
+  println!("15 minute     : {:8.2}", loadavg.load_15m);
+  println!("Runnable tasks: {:8.2} tasks", loadavg.runnable_task_count);
+  println!("Task count    : {:8.2} tasks", loadavg.task_count);
 }
 
