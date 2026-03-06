@@ -14,20 +14,26 @@ fn main() {
     println!("   Utilization: {}%", socket.utilization * 100.0);
     println!("   Frequency: {} Mhz", socket.frequency_khz / 1000.0);
     println!("   Clusters:");
-    for (i, cluster) in socket.clusters.iter().enumerate() {
-      println!("   - Cluster {i}");
-      println!("     Utilization: {}%", cluster.utilization * 100.0);
-      println!("     Frequency: {} Mhz", cluster.frequency_khz / 1000.0);
-      println!("     Cores:");
-      for (i, core) in cluster.cores.iter().enumerate() {
-        println!("     - Core {i}");
-        println!("       Utilization: {}%", core.utilization * 100.0);
-        println!("       Frequency: {} Mhz", core.frequency_khz / 1000.0);
-        println!("       Threads:");
-        for (i, thread) in core.threads.iter().enumerate() {
-          println!("       - Hw thread {i}");
-          println!("         Utilization: {}%", thread.utilization * 100.0);
-          println!("         Frequency: {} Mhz", thread.frequency_khz / 1000.0);
+    for (i, die) in socket.dies.iter().enumerate() {
+      println!("   - Die {i}");
+      println!("     Utilization: {}%", die.utilization * 100.0);
+      println!("     Frequency: {} Mhz", die.frequency_khz / 1000.0);
+      println!("     Clusters:");
+      for (i, cluster) in die.clusters.iter().enumerate() {
+        println!("     - Cluster {i}");
+        println!("       Utilization: {}%", cluster.utilization * 100.0);
+        println!("       Frequency: {} Mhz", cluster.frequency_khz / 1000.0);
+        println!("       Cores:");
+        for (i, core) in cluster.cores.iter().enumerate() {
+          println!("       - Core {i}");
+          println!("         Utilization: {}%", core.utilization * 100.0);
+          println!("         Frequency: {} Mhz", core.frequency_khz / 1000.0);
+          println!("         Threads:");
+          for (i, thread) in core.threads.iter().enumerate() {
+            println!("         - Hw thread {i}");
+            println!("           Utilization: {}%", thread.utilization * 100.0);
+            println!("           Frequency: {} Mhz", thread.frequency_khz / 1000.0);
+          }
         }
       }
     }

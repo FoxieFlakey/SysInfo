@@ -2,7 +2,7 @@ use std::{iter::Peekable, ops::Range, path::{Path, PathBuf}};
 
 use arrayvec::ArrayString;
 
-use crate::{capturers::cpu::{CPU, Cluster, Core, Socket, Thread}, metric::Capturer, util};
+use crate::{capturers::cpu::{CPU, Cluster, Core, Die, Socket, Thread}, metric::Capturer, util};
 
 pub struct CpuCapture;
 
@@ -82,11 +82,17 @@ impl Capturer for CpuCapture {
         Socket {
           frequency_khz: 0.0,
           utilization: 0.0,
-          clusters: vec![
-            Cluster {
-              frequency_khz: 0.0,
+          dies: vec![
+            Die {
               utilization: 0.0,
-              cores
+              frequency_khz: 0.0,
+              clusters: vec![
+                Cluster {
+                  frequency_khz: 0.0,
+                  utilization: 0.0,
+                  cores
+                }
+              ]
             }
           ]
         }

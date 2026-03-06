@@ -7,7 +7,8 @@ mod cluster;
 mod core;
 mod thread;
 mod capture;
-pub use {socket::Socket, cluster::Cluster, core::Core, thread::Thread, capture::CpuCapture};
+mod die;
+pub use {socket::Socket, cluster::Cluster, core::Core, thread::Thread, capture::CpuCapture, die::Die};
 
 #[derive(Clone)]
 pub struct CPU {
