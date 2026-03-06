@@ -27,7 +27,10 @@ impl Capturer for CpuCapture {
     //
     // Source: google and kernel doc
     
-    let list = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/online")).ok()?)?;
+    let online_cpus = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/online")).ok()?)?;
+    let offline_cpus = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/offline")).ok()?)?;
+    let present_cpus = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/present")).ok()?)?;
+    let possible_cpus = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/possible")).ok()?)?;
     
     // Maps physical_package_id to Socket
     let mut topology: HashMap<u32,
@@ -46,7 +49,7 @@ impl Capturer for CpuCapture {
       )
     > = HashMap::new();
     
-    for entry in list {
+    for entry in &online_cpus {
       for id in entry.as_range() {
         let base = PathBuf::from(format!("/sys/devices/system/cpu/cpu{id}"));
         let cur_freq = read_integer(&base.join("cpufreq/scaling_cur_freq"))?;
@@ -112,6 +115,12 @@ impl Capturer for CpuCapture {
     let mut cpu = CPU {
       frequency_khz: 0.0,
       utilization: 0.0,
+      
+      present: count_cpus(&present_cpus).into(),
+      possible: count_cpus(&possible_cpus).into(),
+      online: count_cpus(&online_cpus).into(),
+      offline: count_cpus(&offline_cpus).into(),
+      
       sockets: Vec::new()
     };
     
@@ -198,6 +207,7 @@ fn count_cpus(list: &[CPUEntry]) -> u32 {
 
 // In Linux kernel the list is a "CPU" although practically
 // its more of threads list
+#[derive(Clone, Copy)]
 enum CPUEntry {
   // the 0-3, format, but the .1 is exclusive as its idiomatic in rust
   // so here its 0 and 4

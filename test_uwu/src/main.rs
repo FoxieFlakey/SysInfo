@@ -8,6 +8,10 @@ fn main() {
   
   println!("Utilization: {}%", sample.utilization * 100.0);
   println!("Frequency: {} Mhz", sample.frequency_khz / 1000.0);
+  println!("Present CPU count: {}", sample.present);
+  println!("Possible CPU count: {}", sample.possible);
+  println!("Online CPU count: {}", sample.online);
+  println!("Offline CPU count: {}", sample.offline);
   println!("Sockets:");
   for (i, socket) in sample.sockets.iter().enumerate() {
     println!(" - Socket {i}");
