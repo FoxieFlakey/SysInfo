@@ -1,0 +1,225 @@
+use std::{iter::Peekable, ops::Range, path::{Path, PathBuf}};
+
+use arrayvec::ArrayString;
+
+use crate::{capturers::cpu::{CPU, Cluster, Core, Socket, Thread}, metric::Capturer, util};
+
+pub struct CpuCapture;
+
+impl CpuCapture {
+  pub fn new() -> Self {
+    Self
+  }
+}
+
+impl Capturer for CpuCapture {
+  type Sample = CPU;
+  
+  fn capture(&self) -> Option<Self::Sample> {
+    // There mutliple files under there
+    // /sys/devices/system/cpu/online mean CPUs that is online
+    // /sys/devices/system/cpu/offline mean CPUs that is offline
+    // /sys/devices/system/cpu/present mean CPUs that is present
+    // /sys/devices/system/cpu/possible mean CPUs that Linux can have at maximum
+    //
+    // Sizing of set is online + offline == present, and present <= possible
+    // present also dictates how many /sys/devices/system/cpu/cpuX present (regardless of online/offline/present state)
+    //
+    // Source: google and kernel doc
+    
+    let list = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/online")).ok()?)?;
+    let cpu_count = count_cpus(&list);
+    
+    // Currently lets assume all "cpus" in sysfs is one core :>
+    let mut cores = Vec::new();
+    cores.reserve(usize::try_from(cpu_count).unwrap());
+    
+    for entry in list {
+      for id in entry.as_range() {
+        let base = PathBuf::from(format!("/sys/devices/system/cpu/cpu{id}"));
+        let cur_freq = util::read_all(&base.join("cpufreq/scaling_cur_freq"))
+          .map(|x| {
+            if x.starts_with("-") {
+              // Negative is unacceptable
+              None
+            } else {
+              let mut num = ArrayString::<10>::new();
+              for chr in x.chars() {
+                match chr {
+                  '0'..='9' => {
+                    if num.try_push(chr).is_err() {
+                      return None;
+                    }
+                  }                  
+                  '\n' => break,
+                  _ => return None
+                }
+              }
+              
+              u32::from_str_radix(&num, 10).ok()
+            }
+          })
+          .ok()
+          .flatten()?;
+        
+        cores.push(Core {
+          frequency_khz: 0.0,
+          utilization: 0.0,
+          threads: vec![
+            Thread {
+              utilization: 0.0,
+              frequency_khz: f64::from(cur_freq)
+            }
+          ]
+        });
+      }
+    }
+    
+    let mut cpu = CPU {
+      frequency_khz: 0.0,
+      utilization: 0.0,
+      sockets: vec![
+        Socket {
+          frequency_khz: 0.0,
+          utilization: 0.0,
+          clusters: vec![
+            Cluster {
+              frequency_khz: 0.0,
+              utilization: 0.0,
+              cores
+            }
+          ]
+        }
+      ]
+    };
+    cpu.sanify();
+    
+    Some(cpu)
+  }
+}
+
+fn parse_list(cpu_list: &str) -> Option<Vec<CPUEntry>> {
+  let mut iter = cpu_list.chars().fuse().peekable();
+  let mut list = Vec::new();
+  
+  loop {
+    list.push(CPUEntry::parse(&mut iter)?);
+    
+    match iter.next() {
+      Some(',') => (),
+      Some('\n') => break,
+      _ => return None
+    }
+  }
+  
+  Some(list)
+}
+
+fn count_cpus(list: &[CPUEntry]) -> u32 {
+  list.iter()
+    .fold(0, |acc, entry| {
+      let num = match entry {
+        CPUEntry::Range(start, end) => *end - *start,
+        CPUEntry::Single(x) => *x
+      };
+      
+      num + acc
+    })
+}
+
+// In Linux kernel the list is a "CPU" although practically
+// its more of threads list
+enum CPUEntry {
+  // the 0-3, format, but the .1 is exclusive as its idiomatic in rust
+  // so here its 0 and 4
+  Range(u32, u32),
+  // singular 2
+  Single(u32)
+}
+
+impl CPUEntry {
+  fn as_range(self) -> Range<u32> {
+    match self {
+      CPUEntry::Range(start, end) => start..end,
+      CPUEntry::Single(x) => x..(x + 1)
+    }
+  }
+  
+  fn parse<I: Iterator<Item = char>>(iter: &mut Peekable<I>) -> Option<CPUEntry> {
+    // Because using 32-bit to refer the CPU, in decimal maximum
+    // count is 10 characters 4294967296
+    let mut first_number = ArrayString::<12>::new();
+    
+    // Try fetch first number
+    loop {
+      match iter.peek() {
+        Some(&'-') => {
+          // Cpu entry is invalid, either empty string like ""
+          // or starts with dash like "-32"
+          if first_number.len() == 0 {
+            return None;
+          }
+          
+          break;
+        },
+        // EOL reached
+        Some(&'\n') => break,
+        Some(&c @ '0'..='9') => {
+          if first_number.try_push(c).is_err() {
+            // The number is too big to fit in u32, lets
+            // fail the parse
+            return None;
+          }
+          
+          // Move forward the iteration
+          iter.next();
+        }
+        
+        // Unknown character/unexpected EOF
+        None | Some(_) => return None
+      }
+    }
+    
+    let Ok(lhs) = u32::from_str_radix(&first_number, 10) else {
+        return None;
+      };
+    
+    if let Some('-') = iter.peek() {
+      // Consume the '-' seperator
+      iter.next();
+      
+      // Its a range lets find second number
+      let mut second_number = ArrayString::<10>::new();
+      
+      loop {
+        match iter.peek() {
+          // Read all the digits
+          Some(&chr @ '0'..='9') => {
+            if second_number.try_push(chr).is_err() {
+              // Second number is too long
+              return None;
+            }
+            
+            // Consume the character
+            iter.next();
+          }
+          
+          // Digits to read ran out
+          None | Some(_) => break
+        }
+      }
+      
+      let rhs = u32::from_str_radix(&second_number, 10).ok()?;
+      if rhs <= lhs {
+        // Invalid end
+        return None;
+      }
+      
+      Some(CPUEntry::Range(lhs, rhs + 1))
+    } else {
+      Some(CPUEntry::Single(lhs))
+    }
+  }
+}
+
+

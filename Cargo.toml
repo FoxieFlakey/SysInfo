@@ -1,0 +1,6 @@
+[workspace]
+members = [
+  "sysinfo",
+  "test_uwu"
+]
+resolver = "3"

@@ -1,0 +1,8 @@
+[package]
+name = "sysinfo"
+version = "0.1.0"
+edition = "2024"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+arrayvec = "0.7.6"
