@@ -8,4 +8,5 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 arrayvec = "0.7.6"
+indexmap = "2.13.0"
 libc = "0.2.182"

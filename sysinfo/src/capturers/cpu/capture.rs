@@ -1,6 +1,7 @@
-use std::{collections::HashMap, iter::Peekable, ops::Range, path::{Path, PathBuf}, time::Instant};
+use std::{iter::Peekable, ops::Range, path::{Path, PathBuf}, time::Instant};
 
 use arrayvec::ArrayString;
+use indexmap::IndexMap;
 
 use crate::{capturers::cpu::{CPU, Cluster, Core, Die, Socket, Thread, stat::ProcStat}, metric::Capturer, util};
 
@@ -46,21 +47,21 @@ impl Capturer for CpuCapture {
     let possible_cpus = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/possible")).ok()?)?;
     
     // Maps physical_package_id to Socket
-    let mut topology: HashMap<u32,
+    let mut topology: IndexMap<u32,
       (
         Socket,
         // Maps die_id to Socket
-        HashMap<u32, (
+        IndexMap<u32, (
           Die,
           // Maps cluster_id to Cluster
-          HashMap<u32, (
+          IndexMap<u32, (
             Cluster,
             // Maps core_id to Core
-            HashMap<u32, Core>
+            IndexMap<u32, Core>
           )>
         )>
       )
-    > = HashMap::new();
+    > = IndexMap::new();
     
     for entry in &present_cpus {
       for id in entry.as_range() {
@@ -97,7 +98,7 @@ impl Capturer for CpuCapture {
                 utilization: 0.0,
                 dies: Vec::new()
               },
-              HashMap::new()
+              IndexMap::new()
             )
           );
         
@@ -109,7 +110,7 @@ impl Capturer for CpuCapture {
                 utilization: 0.0,
                 clusters: Vec::new()
               },
-              HashMap::new()
+              IndexMap::new()
             )
           );
         
@@ -121,7 +122,7 @@ impl Capturer for CpuCapture {
                 utilization: 0.0,
                 cores: Vec::new()
               },
-              HashMap::new()
+              IndexMap::new()
             )
           );
         
