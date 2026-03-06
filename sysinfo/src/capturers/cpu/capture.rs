@@ -37,30 +37,7 @@ impl Capturer for CpuCapture {
     for entry in list {
       for id in entry.as_range() {
         let base = PathBuf::from(format!("/sys/devices/system/cpu/cpu{id}"));
-        let cur_freq = util::read_all(&base.join("cpufreq/scaling_cur_freq"))
-          .map(|x| {
-            if x.starts_with("-") {
-              // Negative is unacceptable
-              None
-            } else {
-              let mut num = ArrayString::<10>::new();
-              for chr in x.chars() {
-                match chr {
-                  '0'..='9' => {
-                    if num.try_push(chr).is_err() {
-                      return None;
-                    }
-                  }                  
-                  '\n' => break,
-                  _ => return None
-                }
-              }
-              
-              u32::from_str_radix(&num, 10).ok()
-            }
-          })
-          .ok()
-          .flatten()?;
+        let cur_freq = read_integer(&base.join("cpufreq/scaling_cur_freq"))?;
         
         cores.push(Core {
           frequency_khz: 0.0,
@@ -102,6 +79,33 @@ impl Capturer for CpuCapture {
     
     Some(cpu)
   }
+}
+
+fn read_integer(path: &Path) -> Option<u32> {
+  util::read_all(&path)
+    .map(|x| {
+      if x.starts_with("-") {
+        // Negative is unacceptable
+        None
+      } else {
+        let mut num = ArrayString::<10>::new();
+        for chr in x.chars() {
+          match chr {
+            '0'..='9' => {
+              if num.try_push(chr).is_err() {
+                return None;
+              }
+            }                  
+            '\n' => break,
+            _ => return None
+          }
+        }
+        
+        u32::from_str_radix(&num, 10).ok()
+      }
+    })
+    .ok()
+    .flatten()
 }
 
 fn parse_list(cpu_list: &str) -> Option<Vec<CPUEntry>> {
