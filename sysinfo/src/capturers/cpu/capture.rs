@@ -49,7 +49,7 @@ impl Capturer for CpuCapture {
       )
     > = HashMap::new();
     
-    for entry in &online_cpus {
+    for entry in &present_cpus {
       for id in entry.as_range() {
         let base = PathBuf::from(format!("/sys/devices/system/cpu/cpu{id}"));
         let cur_freq = read_integer(&base.join("cpufreq/scaling_cur_freq"))?;
