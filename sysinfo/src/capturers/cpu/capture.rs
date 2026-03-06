@@ -1,4 +1,4 @@
-use std::{iter::Peekable, ops::Range, path::{Path, PathBuf}};
+use std::{collections::HashMap, iter::Peekable, ops::Range, path::{Path, PathBuf}};
 
 use arrayvec::ArrayString;
 
@@ -28,26 +28,83 @@ impl Capturer for CpuCapture {
     // Source: google and kernel doc
     
     let list = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/online")).ok()?)?;
-    let cpu_count = count_cpus(&list);
     
-    // Currently lets assume all "cpus" in sysfs is one core :>
-    let mut cores = Vec::new();
-    cores.reserve(usize::try_from(cpu_count).unwrap());
+    // Maps physical_package_id to Socket
+    let mut topology: HashMap<u32,
+      (
+        Socket,
+        // Maps die_id to Socket
+        HashMap<u32, (
+          Die,
+          // Maps cluster_id to Cluster
+          HashMap<u32, (
+            Cluster,
+            // Maps core_id to Core
+            HashMap<u32, Core>
+          )>
+        )>
+      )
+    > = HashMap::new();
     
     for entry in list {
       for id in entry.as_range() {
         let base = PathBuf::from(format!("/sys/devices/system/cpu/cpu{id}"));
         let cur_freq = read_integer(&base.join("cpufreq/scaling_cur_freq"))?;
         
-        cores.push(Core {
-          frequency_khz: 0.0,
-          utilization: 0.0,
-          threads: vec![
-            Thread {
+        let physical_package_id = read_integer(&base.join("topology/physical_package_id"))?;
+        let die_id = read_integer(&base.join("topology/die_id"))?;
+        let cluster_id = read_integer(&base.join("topology/cluster_id"))?;
+        let core_id = read_integer(&base.join("topology/core_id"))?;
+        
+        let socket = topology
+          .entry(physical_package_id)
+          .or_insert_with(|| (
+              Socket {
+                frequency_khz: 0.0,
+                utilization: 0.0,
+                dies: Vec::new()
+              },
+              HashMap::new()
+            )
+          );
+        
+        let die = socket.1
+          .entry(die_id)
+          .or_insert_with(|| (
+              Die {
+                frequency_khz: 0.0,
+                utilization: 0.0,
+                clusters: Vec::new()
+              },
+              HashMap::new()
+            )
+          );
+        
+        let cluster = die.1
+          .entry(cluster_id)
+          .or_insert_with(|| (
+              Cluster {
+                frequency_khz: 0.0,
+                utilization: 0.0,
+                cores: Vec::new()
+              },
+              HashMap::new()
+            )
+          );
+        
+        let core = cluster.1
+          .entry(core_id)
+          .or_insert_with(||
+            Core {
+              frequency_khz: 0.0,
               utilization: 0.0,
-              frequency_khz: f64::from(cur_freq)
+              threads: Vec::new()
             }
-          ]
+          );
+        
+        core.threads.push(Thread {
+          frequency_khz: f64::from(cur_freq),
+          utilization: 0.0
         });
       }
     }
@@ -55,26 +112,23 @@ impl Capturer for CpuCapture {
     let mut cpu = CPU {
       frequency_khz: 0.0,
       utilization: 0.0,
-      sockets: vec![
-        Socket {
-          frequency_khz: 0.0,
-          utilization: 0.0,
-          dies: vec![
-            Die {
-              utilization: 0.0,
-              frequency_khz: 0.0,
-              clusters: vec![
-                Cluster {
-                  frequency_khz: 0.0,
-                  utilization: 0.0,
-                  cores
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      sockets: Vec::new()
     };
+    
+    // Lol, nests :3
+    for (_, (mut socket, dies)) in topology {
+      for (_, (mut die, clusters)) in dies {
+        for (_, (mut cluster, cores)) in clusters {
+          for (_, core) in cores {
+            cluster.cores.push(core);
+          }
+          die.clusters.push(cluster);
+        }
+        socket.dies.push(die);
+      }
+      cpu.sockets.push(socket);
+    }
+    
     cpu.sanify();
     
     Some(cpu)
