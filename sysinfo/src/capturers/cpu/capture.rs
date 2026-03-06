@@ -25,7 +25,7 @@ impl Capturer for CpuCapture {
     // Sizing of set is online + offline == present, and present <= possible
     // present also dictates how many /sys/devices/system/cpu/cpuX present (regardless of online/offline/present state)
     //
-    // Source: google and kernel doc
+    // Source: google and kernel doc at https://www.kernel.org/doc/Documentation/ABI/stable/sysfs-devices-system-cpu
     
     let online_cpus = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/online")).ok()?)?;
     let offline_cpus = parse_list(&util::read_all(Path::new("/sys/devices/system/cpu/offline")).ok()?)?;

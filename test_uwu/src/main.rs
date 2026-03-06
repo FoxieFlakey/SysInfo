@@ -5,6 +5,7 @@ fn main() {
   sysinfo.update();
   
   let sample = sysinfo.cpu_usage.data.samples.front().unwrap().as_ref().unwrap();
+  let swaps = sysinfo.swap_usage.data.samples.front().unwrap().as_ref().unwrap();
   
   println!("Utilization: {}%", sample.utilization * 100.0);
   println!("Frequency: {} Mhz", sample.frequency_khz / 1000.0);
@@ -42,6 +43,16 @@ fn main() {
         }
       }
     }
+  }
+  
+  println!("Swap in system:");
+  println!("Total size: {} MiB", swaps.total_size_kib / 1024.0);
+  println!("Total used: {} MiB", swaps.total_used_kib / 1024.0);
+  println!("Swap devices:");
+  for dev in &swaps.swaps {
+    println!(" - Swap at {}", dev.path);
+    println!("   Used: {} MiB", dev.used_kib / 1024.0);
+    println!("   Size: {} MiB", dev.size_kib / 1024.0);
   }
 }
 
