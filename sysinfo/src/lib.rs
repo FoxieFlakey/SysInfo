@@ -28,7 +28,7 @@ impl SysInfo {
     self.swap_usage.prep_update();
     self.memory_usage.prep_update();
     
-    thread::sleep(Duration::from_millis(500));
+    thread::sleep(Duration::from_millis(700));
     
     self.cpu_usage.update();
     self.swap_usage.update();
