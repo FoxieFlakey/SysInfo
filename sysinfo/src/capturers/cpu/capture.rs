@@ -54,6 +54,10 @@ impl Capturer for CpuCapture {
         let base = PathBuf::from(format!("/sys/devices/system/cpu/cpu{id}"));
         let cur_freq = read_integer(&base.join("cpufreq/scaling_cur_freq"))?;
         
+        // On some CPU, the 'online' file didnt exists, it usually meant the cpu can't be taken offline
+        // so its always online
+        let is_online = read_integer(&base.join("online")).unwrap_or(1) != 0;
+        
         let physical_package_id = read_integer(&base.join("topology/physical_package_id"))?;
         let die_id = read_integer(&base.join("topology/die_id"))?;
         let cluster_id = read_integer(&base.join("topology/cluster_id"))?;
@@ -107,6 +111,7 @@ impl Capturer for CpuCapture {
         
         core.threads.push(Thread {
           frequency_khz: f64::from(cur_freq),
+          online_percent: if is_online { 1.0 } else { 0.0 },
           utilization: 0.0
         });
       }

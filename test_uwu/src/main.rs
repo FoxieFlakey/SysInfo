@@ -35,6 +35,7 @@ fn main() {
           println!("         Threads:");
           for (i, thread) in core.threads.iter().enumerate() {
             println!("         - Hw thread {i}");
+            println!("           Online percent: {}%", thread.online_percent * 100.0);
             println!("           Utilization: {}%", thread.utilization * 100.0);
             println!("           Frequency: {} Mhz", thread.frequency_khz / 1000.0);
           }
