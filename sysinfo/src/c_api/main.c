@@ -26,7 +26,7 @@ int main() {
   double available = memory->mem_available_kib / 1024.0;
   double anonymous_memory = memory->anon_pages_kib / 1024.0;
   
-  printf("This is same output as the one from Rust's test_uwu crate using same API but with C:3\n");
+  printf("This is same output as the one from Rust's test_uwu crate using same API but with C meow meow~ :3\n");
   
   printf("Total memory      : %12.2lf MiB\n", total);
   printf("Free              : %12.2lf MiB\n", free);
