@@ -2,6 +2,8 @@ mod metric;
 mod capturers;
 mod util;
 
+pub mod c_api;
+
 use std::{thread, time::Duration};
 
 use metric::Metric;

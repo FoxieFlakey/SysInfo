@@ -27,6 +27,7 @@ pub use capturer::MemoryCapturer;
 use crate::metric::Sample;
 
 #[derive(Clone)]
+#[repr(C)]
 pub struct Memory {
   pub mem_total_kib: f64,
   pub mem_free_kib: f64,
