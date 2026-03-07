@@ -24,7 +24,7 @@ use std::ops::{AddAssign, DivAssign, SubAssign};
 mod capturer;
 pub use capturer::MemoryCapturer;
 
-use crate::metric::Sample;
+use crate::{c_api::option::COption, metric::Sample};
 
 #[derive(Clone)]
 #[repr(C)]
@@ -54,20 +54,20 @@ pub struct Memory {
   pub writeback_temp_kib: f64,
   
   // Things that is optional
-  pub lazy_free_kib: Option<f64>,
-  pub direct_map_4k_kib: Option<f64>,
-  pub direct_map_2m_kib: Option<f64>,
-  pub direct_map_4m_kib: Option<f64>,
-  pub direct_map_1g_kib: Option<f64>,
-  pub hardware_corrupted_kib: Option<f64>,
-  pub anon_huge_pages_kib: Option<f64>,
-  pub shmem_huge_pages_kib: Option<f64>,
-  pub shmem_mapped_huge_pages_kib: Option<f64>,
-  pub huge_pages_total_kib: Option<f64>,
-  pub huge_pages_free_kib: Option<f64>,
-  pub huge_pages_reserved_kib: Option<f64>,
-  pub huge_pages_surplus_kib: Option<f64>,
-  pub huge_page_size_kib: Option<f64>
+  pub lazy_free_kib: COption<f64>,
+  pub direct_map_4k_kib: COption<f64>,
+  pub direct_map_2m_kib: COption<f64>,
+  pub direct_map_4m_kib: COption<f64>,
+  pub direct_map_1g_kib: COption<f64>,
+  pub hardware_corrupted_kib: COption<f64>,
+  pub anon_huge_pages_kib: COption<f64>,
+  pub shmem_huge_pages_kib: COption<f64>,
+  pub shmem_mapped_huge_pages_kib: COption<f64>,
+  pub huge_pages_total_kib: COption<f64>,
+  pub huge_pages_free_kib: COption<f64>,
+  pub huge_pages_reserved_kib: COption<f64>,
+  pub huge_pages_surplus_kib: COption<f64>,
+  pub huge_page_size_kib: COption<f64>
 }
 
 impl<'a> AddAssign<&'a Self> for Memory {
@@ -97,72 +97,72 @@ impl<'a> AddAssign<&'a Self> for Memory {
     self.writeback_temp_kib += rhs.writeback_temp_kib;
     
     self.lazy_free_kib.iter_mut()
-      .zip(rhs.lazy_free_kib)
+      .zip(&rhs.lazy_free_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.direct_map_4k_kib.iter_mut()
-      .zip(rhs.direct_map_4k_kib)
+      .zip(&rhs.direct_map_4k_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.direct_map_2m_kib.iter_mut()
-      .zip(rhs.direct_map_2m_kib)
+      .zip(&rhs.direct_map_2m_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.direct_map_4m_kib.iter_mut()
-      .zip(rhs.direct_map_4m_kib)
+      .zip(&rhs.direct_map_4m_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.direct_map_1g_kib.iter_mut()
-      .zip(rhs.direct_map_1g_kib)
+      .zip(&rhs.direct_map_1g_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.hardware_corrupted_kib.iter_mut()
-      .zip(rhs.hardware_corrupted_kib)
+      .zip(&rhs.hardware_corrupted_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.anon_huge_pages_kib.iter_mut()
-      .zip(rhs.anon_huge_pages_kib)
+      .zip(&rhs.anon_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.shmem_huge_pages_kib.iter_mut()
-      .zip(rhs.shmem_huge_pages_kib)
+      .zip(&rhs.shmem_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.shmem_mapped_huge_pages_kib.iter_mut()
-      .zip(rhs.shmem_mapped_huge_pages_kib)
+      .zip(&rhs.shmem_mapped_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.huge_pages_total_kib.iter_mut()
-      .zip(rhs.huge_pages_total_kib)
+      .zip(&rhs.huge_pages_total_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.huge_pages_free_kib.iter_mut()
-      .zip(rhs.huge_pages_free_kib)
+      .zip(&rhs.huge_pages_free_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.huge_pages_reserved_kib.iter_mut()
-      .zip(rhs.huge_pages_reserved_kib)
+      .zip(&rhs.huge_pages_reserved_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.huge_pages_surplus_kib.iter_mut()
-      .zip(rhs.huge_pages_surplus_kib)
+      .zip(&rhs.huge_pages_surplus_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
     self.huge_page_size_kib.iter_mut()
-      .zip(rhs.huge_page_size_kib)
+      .zip(&rhs.huge_page_size_kib)
       .for_each(|(lhs, rhs)| {
         *lhs += rhs;
       });
@@ -196,72 +196,72 @@ impl<'a> SubAssign<&'a Self> for Memory {
     self.writeback_temp_kib -= rhs.writeback_temp_kib;
     
     self.lazy_free_kib.iter_mut()
-      .zip(rhs.lazy_free_kib)
+      .zip(&rhs.lazy_free_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.direct_map_4k_kib.iter_mut()
-      .zip(rhs.direct_map_4k_kib)
+      .zip(&rhs.direct_map_4k_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.direct_map_2m_kib.iter_mut()
-      .zip(rhs.direct_map_2m_kib)
+      .zip(&rhs.direct_map_2m_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.direct_map_4m_kib.iter_mut()
-      .zip(rhs.direct_map_4m_kib)
+      .zip(&rhs.direct_map_4m_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.direct_map_1g_kib.iter_mut()
-      .zip(rhs.direct_map_1g_kib)
+      .zip(&rhs.direct_map_1g_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.hardware_corrupted_kib.iter_mut()
-      .zip(rhs.hardware_corrupted_kib)
+      .zip(&rhs.hardware_corrupted_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.anon_huge_pages_kib.iter_mut()
-      .zip(rhs.anon_huge_pages_kib)
+      .zip(&rhs.anon_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.shmem_huge_pages_kib.iter_mut()
-      .zip(rhs.shmem_huge_pages_kib)
+      .zip(&rhs.shmem_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.shmem_mapped_huge_pages_kib.iter_mut()
-      .zip(rhs.shmem_mapped_huge_pages_kib)
+      .zip(&rhs.shmem_mapped_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.huge_pages_total_kib.iter_mut()
-      .zip(rhs.huge_pages_total_kib)
+      .zip(&rhs.huge_pages_total_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.huge_pages_free_kib.iter_mut()
-      .zip(rhs.huge_pages_free_kib)
+      .zip(&rhs.huge_pages_free_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.huge_pages_reserved_kib.iter_mut()
-      .zip(rhs.huge_pages_reserved_kib)
+      .zip(&rhs.huge_pages_reserved_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.huge_pages_surplus_kib.iter_mut()
-      .zip(rhs.huge_pages_surplus_kib)
+      .zip(&rhs.huge_pages_surplus_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
     self.huge_page_size_kib.iter_mut()
-      .zip(rhs.huge_page_size_kib)
+      .zip(&rhs.huge_page_size_kib)
       .for_each(|(lhs, rhs)| {
         *lhs -= rhs;
       });
@@ -380,74 +380,74 @@ impl Sample<'_> for Memory {
     self.writeback_temp_kib = f64::max(self.writeback_temp_kib, rhs.writeback_temp_kib);
     
     self.lazy_free_kib.iter_mut()
-      .zip(rhs.lazy_free_kib)
+      .zip(&rhs.lazy_free_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.direct_map_4k_kib.iter_mut()
-      .zip(rhs.direct_map_4k_kib)
+      .zip(&rhs.direct_map_4k_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.direct_map_2m_kib.iter_mut()
-      .zip(rhs.direct_map_2m_kib)
+      .zip(&rhs.direct_map_2m_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.direct_map_4m_kib.iter_mut()
-      .zip(rhs.direct_map_4m_kib)
+      .zip(&rhs.direct_map_4m_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.direct_map_1g_kib.iter_mut()
-      .zip(rhs.direct_map_1g_kib)
+      .zip(&rhs.direct_map_1g_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.hardware_corrupted_kib.iter_mut()
-      .zip(rhs.hardware_corrupted_kib)
+      .zip(&rhs.hardware_corrupted_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.anon_huge_pages_kib.iter_mut()
-      .zip(rhs.anon_huge_pages_kib)
+      .zip(&rhs.anon_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.shmem_huge_pages_kib.iter_mut()
-      .zip(rhs.shmem_huge_pages_kib)
+      .zip(&rhs.shmem_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.shmem_mapped_huge_pages_kib.iter_mut()
-      .zip(rhs.shmem_mapped_huge_pages_kib)
+      .zip(&rhs.shmem_mapped_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.huge_pages_total_kib.iter_mut()
-      .zip(rhs.huge_pages_total_kib)
+      .zip(&rhs.huge_pages_total_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.huge_pages_free_kib.iter_mut()
-      .zip(rhs.huge_pages_free_kib)
+      .zip(&rhs.huge_pages_free_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.huge_pages_reserved_kib.iter_mut()
-      .zip(rhs.huge_pages_reserved_kib)
+      .zip(&rhs.huge_pages_reserved_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.huge_pages_surplus_kib.iter_mut()
-      .zip(rhs.huge_pages_surplus_kib)
+      .zip(&rhs.huge_pages_surplus_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
     self.huge_page_size_kib.iter_mut()
-      .zip(rhs.huge_page_size_kib)
+      .zip(&rhs.huge_page_size_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::max(*lhs, rhs);
+        *lhs = f64::max(*lhs, *rhs);
       });
   }
   
@@ -477,74 +477,74 @@ impl Sample<'_> for Memory {
     self.writeback_temp_kib = f64::min(self.writeback_temp_kib, rhs.writeback_temp_kib);
     
     self.lazy_free_kib.iter_mut()
-      .zip(rhs.lazy_free_kib)
+      .zip(&rhs.lazy_free_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.direct_map_4k_kib.iter_mut()
-      .zip(rhs.direct_map_4k_kib)
+      .zip(&rhs.direct_map_4k_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.direct_map_2m_kib.iter_mut()
-      .zip(rhs.direct_map_2m_kib)
+      .zip(&rhs.direct_map_2m_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.direct_map_4m_kib.iter_mut()
-      .zip(rhs.direct_map_4m_kib)
+      .zip(&rhs.direct_map_4m_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.direct_map_1g_kib.iter_mut()
-      .zip(rhs.direct_map_1g_kib)
+      .zip(&rhs.direct_map_1g_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.hardware_corrupted_kib.iter_mut()
-      .zip(rhs.hardware_corrupted_kib)
+      .zip(&rhs.hardware_corrupted_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.anon_huge_pages_kib.iter_mut()
-      .zip(rhs.anon_huge_pages_kib)
+      .zip(&rhs.anon_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.shmem_huge_pages_kib.iter_mut()
-      .zip(rhs.shmem_huge_pages_kib)
+      .zip(&rhs.shmem_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.shmem_mapped_huge_pages_kib.iter_mut()
-      .zip(rhs.shmem_mapped_huge_pages_kib)
+      .zip(&rhs.shmem_mapped_huge_pages_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.huge_pages_total_kib.iter_mut()
-      .zip(rhs.huge_pages_total_kib)
+      .zip(&rhs.huge_pages_total_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.huge_pages_free_kib.iter_mut()
-      .zip(rhs.huge_pages_free_kib)
+      .zip(&rhs.huge_pages_free_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.huge_pages_reserved_kib.iter_mut()
-      .zip(rhs.huge_pages_reserved_kib)
+      .zip(&rhs.huge_pages_reserved_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.huge_pages_surplus_kib.iter_mut()
-      .zip(rhs.huge_pages_surplus_kib)
+      .zip(&rhs.huge_pages_surplus_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
     self.huge_page_size_kib.iter_mut()
-      .zip(rhs.huge_page_size_kib)
+      .zip(&rhs.huge_page_size_kib)
       .for_each(|(lhs, rhs)| {
-        *lhs = f64::min(*lhs, rhs);
+        *lhs = f64::min(*lhs, *rhs);
       });
   }
 }

@@ -157,20 +157,20 @@ impl Capturer for MemoryCapturer {
       bounce_kib: bounce_kib?,
       writeback_temp_kib: writeback_temp_kib?,
       
-      lazy_free_kib,
-      direct_map_4k_kib,
-      direct_map_2m_kib,
-      direct_map_4m_kib,
-      direct_map_1g_kib,
-      hardware_corrupted_kib,
-      anon_huge_pages_kib,
-      shmem_huge_pages_kib,
-      shmem_mapped_huge_pages_kib,
-      huge_pages_total_kib,
-      huge_pages_free_kib,
-      huge_pages_reserved_kib,
-      huge_pages_surplus_kib,
-      huge_page_size_kib
+      lazy_free_kib: lazy_free_kib.into(),
+      direct_map_4k_kib: direct_map_4k_kib.into(),
+      direct_map_2m_kib: direct_map_2m_kib.into(),
+      direct_map_4m_kib: direct_map_4m_kib.into(),
+      direct_map_1g_kib: direct_map_1g_kib.into(),
+      hardware_corrupted_kib: hardware_corrupted_kib.into(),
+      anon_huge_pages_kib: anon_huge_pages_kib.into(),
+      shmem_huge_pages_kib: shmem_huge_pages_kib.into(),
+      shmem_mapped_huge_pages_kib: shmem_mapped_huge_pages_kib.into(),
+      huge_pages_total_kib: huge_pages_total_kib.into(),
+      huge_pages_free_kib: huge_pages_free_kib.into(),
+      huge_pages_reserved_kib: huge_pages_reserved_kib.into(),
+      huge_pages_surplus_kib: huge_pages_surplus_kib.into(),
+      huge_page_size_kib: huge_page_size_kib.into()
     })
   }
 }

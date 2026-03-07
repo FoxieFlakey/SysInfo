@@ -2,6 +2,8 @@ use std::{ffi::c_void, ptr::NonNull};
 
 use crate::SysInfo;
 
+pub mod option;
+
 #[unsafe(no_mangle)]
 pub extern "C" fn sysinfo_new() -> *mut c_void {
   Box::into_raw(Box::new(SysInfo::new())) as *mut c_void

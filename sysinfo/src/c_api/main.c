@@ -3,6 +3,13 @@
 
 #include "sysinfo.h"
 
+static void print_opt(const char* name, const struct maybe_double* maybe) {
+  if (maybe->is_present)
+    printf("Field '%s' present with %.2lf MiB\n", name, *maybe_double_get(maybe));
+  else
+    printf("Field '%s' is not present\n", name);
+}
+
 int main() {
   struct sysinfo* sysinfo = sysinfo_new();
   sysinfo_update(sysinfo);
@@ -46,6 +53,23 @@ int main() {
   printf("Cache     : %12.2lf MiB\n", cached);
   printf("Writeback : %12.2lf MiB (pending to written to disk)\n", writeback);
   printf("Available : %12.2lf MiB\n", available);
+  
+  printf("\nOptional fields:\n");
+  
+  print_opt("lazy_free_kib", &memory->lazy_free_kib);
+  print_opt("direct_map_4k_kib", &memory->direct_map_4k_kib);
+  print_opt("direct_map_2m_kib", &memory->direct_map_2m_kib);
+  print_opt("direct_map_4m_kib", &memory->direct_map_4m_kib);
+  print_opt("direct_map_1g_kib", &memory->direct_map_1g_kib);
+  print_opt("hardware_corrupted_kib", &memory->hardware_corrupted_kib);
+  print_opt("anon_huge_pages_kib", &memory->anon_huge_pages_kib);
+  print_opt("shmem_huge_pages_kib", &memory->shmem_huge_pages_kib);
+  print_opt("shmem_mapped_huge_pages_kib", &memory->shmem_mapped_huge_pages_kib);
+  print_opt("huge_pages_total_kib", &memory->huge_pages_total_kib);
+  print_opt("huge_pages_free_kib", &memory->huge_pages_free_kib);
+  print_opt("huge_pages_reserved_kib", &memory->huge_pages_reserved_kib);
+  print_opt("huge_pages_surplus_kib", &memory->huge_pages_surplus_kib);
+  print_opt("huge_page_size_kib", &memory->huge_page_size_kib);
   
 exit:
   sysinfo_free(sysinfo);
