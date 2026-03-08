@@ -11,15 +11,15 @@ void sysinfo_free(struct sysinfo* _Nonnull this);
 
 void sysinfo_update(struct sysinfo* _Nonnull this);
 
-#define SYSINFO_COPTION_TEMPLATE(T) struct { \
+#define SYSINFO_COPTION_TEMPLATE(name, T) struct name { \
     _Bool coption_is_present; \
     T coption_data; \
   }
 
 #define sysinfo_coption_get(this) ((this)->coption_is_present ? &(this)->coption_data : NULL)
 
-#define SYSINFO_CVEC_TEMPLATE(T) \
-  struct { \
+#define SYSINFO_CVEC_TEMPLATE(name, T) \
+  struct name { \
     size_t cvec_length; \
     size_t cvec_capacity; \
     T* cvec_data; \
@@ -34,7 +34,7 @@ void sysinfo_update(struct sysinfo* _Nonnull this);
 // must use these instead of via template macro
 // 
 // This way would allow C++ methods to be usable
-typedef SYSINFO_COPTION_TEMPLATE(double) sysinfo_maybe_double;
+SYSINFO_COPTION_TEMPLATE(sysinfo_maybe_double, double);
 
 // Get metric for a given resource
 struct sysinfo_memory {
@@ -62,20 +62,20 @@ struct sysinfo_memory {
   double bounce_kib;
   double writeback_temp_kib;
   
-  sysinfo_maybe_double lazy_free_kib;
-  sysinfo_maybe_double direct_map_4k_kib;
-  sysinfo_maybe_double direct_map_2m_kib;
-  sysinfo_maybe_double direct_map_4m_kib;
-  sysinfo_maybe_double direct_map_1g_kib;
-  sysinfo_maybe_double hardware_corrupted_kib;
-  sysinfo_maybe_double anon_huge_pages_kib;
-  sysinfo_maybe_double shmem_huge_pages_kib;
-  sysinfo_maybe_double shmem_mapped_huge_pages_kib;
-  sysinfo_maybe_double huge_pages_total_kib;
-  sysinfo_maybe_double huge_pages_free_kib;
-  sysinfo_maybe_double huge_pages_reserved_kib;
-  sysinfo_maybe_double huge_pages_surplus_kib;
-  sysinfo_maybe_double huge_page_size_kib;
+  struct sysinfo_maybe_double lazy_free_kib;
+  struct sysinfo_maybe_double direct_map_4k_kib;
+  struct sysinfo_maybe_double direct_map_2m_kib;
+  struct sysinfo_maybe_double direct_map_4m_kib;
+  struct sysinfo_maybe_double direct_map_1g_kib;
+  struct sysinfo_maybe_double hardware_corrupted_kib;
+  struct sysinfo_maybe_double anon_huge_pages_kib;
+  struct sysinfo_maybe_double shmem_huge_pages_kib;
+  struct sysinfo_maybe_double shmem_mapped_huge_pages_kib;
+  struct sysinfo_maybe_double huge_pages_total_kib;
+  struct sysinfo_maybe_double huge_pages_free_kib;
+  struct sysinfo_maybe_double huge_pages_reserved_kib;
+  struct sysinfo_maybe_double huge_pages_surplus_kib;
+  struct sysinfo_maybe_double huge_page_size_kib;
 };
 
 struct sysinfo_memory* _Nullable sysinfo_get_latest_memory_sample(const struct sysinfo* _Nonnull this);
