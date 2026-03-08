@@ -1,4 +1,4 @@
-use std::{slice, alloc::{Allocator, Global, Layout, handle_alloc_error}, ffi::{c_char, c_size_t}, ptr::NonNull, ascii};
+use std::{alloc::{Allocator, Global, Layout, handle_alloc_error}, ascii, ffi::{c_char, c_size_t}, fmt::Display, ptr::NonNull, slice};
 
 // Like Rust's CString but its bare pointer + length
 // the 'raw' also null terminated, C doesn't need to
@@ -108,6 +108,12 @@ impl AsRef<str> for CString {
     unsafe {
       str::from_utf8_unchecked(slice::from_raw_parts(self.raw.as_ptr().cast(), usize::try_from(self.length).unwrap()))
     }
+  }
+}
+
+impl Display for CString {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.as_str())
   }
 }
 
