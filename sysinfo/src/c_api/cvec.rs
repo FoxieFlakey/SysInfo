@@ -158,3 +158,12 @@ impl<'a, T: Unpin> Iterator for IterMut<'a, T> {
   }
 }
 
+impl<'a, T: Unpin> IntoIterator for &'a CVec<T> {
+  type Item = &'a T;
+  type IntoIter = Iter<'a, T>;
+  
+  fn into_iter(self) -> Self::IntoIter {
+    self.iter()
+  }
+}
+
