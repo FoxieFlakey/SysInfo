@@ -3,9 +3,9 @@
 
 #include "sysinfo.h"
 
-static void print_opt(const char* name, const struct maybe_double* maybe) {
-  if (maybe->is_present)
-    printf("Field '%s' present with %.2lf MiB\n", name, *maybe_double_get(maybe));
+static void print_opt(const char* name, const sysinfo_maybe_double* maybe) {
+  if (maybe->coption_is_present)
+    printf("Field '%s' present with %.2lf MiB\n", name, *sysinfo_coption_get(maybe));
   else
     printf("Field '%s' is not present\n", name);
 }
