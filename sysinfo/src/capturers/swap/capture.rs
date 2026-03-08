@@ -48,7 +48,7 @@ impl Capturer for SwapCapture {
       let used = u32::from_str_radix(used, 10).ok()?;
       
       devs.push(SwapDev {
-        path: filename.to_string(),
+        path: filename.to_string().try_into().ok()?,
         size_kib: f64::from(size),
         used_kib: f64::from(used)
       });

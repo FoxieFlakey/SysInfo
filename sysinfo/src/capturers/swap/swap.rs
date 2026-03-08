@@ -1,8 +1,10 @@
 use std::ops::{AddAssign, DivAssign, SubAssign};
 
+use crate::c_api::cstring::CString;
+
 #[derive(Clone)]
 pub struct SwapDev {
-  pub path: String,
+  pub path: CString,
   pub size_kib: f64,
   pub used_kib: f64
 }

@@ -1,5 +1,7 @@
 #![feature(c_size_t)]
 #![feature(allocator_api)]
+#![feature(ascii_char)]
+#![feature(ascii_char_variants)]
 
 mod metric;
 mod capturers;

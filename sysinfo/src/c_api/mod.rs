@@ -4,6 +4,7 @@ use crate::SysInfo;
 
 pub mod option;
 pub mod cvec;
+pub mod cstring;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sysinfo_new() -> *mut c_void {

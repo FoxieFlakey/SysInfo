@@ -36,6 +36,21 @@ void sysinfo_update(struct sysinfo* _Nonnull this);
 // This way would allow C++ methods to be usable
 SYSINFO_COPTION_TEMPLATE(sysinfo_maybe_double, double);
 
+struct sysinfo_cstring {
+  size_t cstring_length;
+  const char* cstring_string;
+};
+
+__attribute__((unused))
+static inline size_t sysinfo_cstring_len(const struct sysinfo_cstring* this) {
+  return this->cstring_length;
+}
+
+__attribute__((unused))
+static inline const char* sysinfo_cstring_get(const struct sysinfo_cstring* this) {
+  return this->cstring_string;
+}
+
 // Get metric for a given resource
 struct sysinfo_memory {
   double mem_total_kib;
