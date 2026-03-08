@@ -34,7 +34,7 @@ impl Drop for CString {
 
 impl CString {
   pub fn new(ascii_str: &[ascii::Char]) -> Option<Self> {
-    if ascii_str.iter().find(|&&x| x == ascii::Char::Null).is_none() {
+    if ascii_str.iter().find(|&&x| x == ascii::Char::Null).is_some() {
       return None;
     }
     
