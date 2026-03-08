@@ -66,7 +66,7 @@ impl<T: Unpin> CVec<T> {
     let res = match self.data {
       // SAFETY: The data is safe to be moved, and its certain growing due checks earlier
       // on new_capacity <= self.capacity
-      Some(existing) => unsafe { Global.grow(existing.cast(), old_layout, layout) }      
+      Some(existing) => unsafe { Global.grow(existing.cast(), old_layout, layout) }
       None => Global.allocate(layout)
     };
     
