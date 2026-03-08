@@ -1,17 +1,18 @@
 use std::ops::{AddAssign, DivAssign, SubAssign};
 
-use crate::metric::Sample;
+use crate::{c_api::cvec::CVec, metric::Sample};
 
 mod swap;
 mod capture;
 
 pub use {swap::SwapDev, capture::SwapCapture};
 
+#[repr(C)]
 #[derive(Clone)]
 pub struct Swaps {
   pub total_size_kib: f64,
   pub total_used_kib: f64,
-  pub swaps: Vec<SwapDev>
+  pub swaps: CVec<SwapDev>
 }
 
 impl Swaps {

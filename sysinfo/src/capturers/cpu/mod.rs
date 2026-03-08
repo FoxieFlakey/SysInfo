@@ -1,6 +1,6 @@
 use std::ops::{AddAssign, DivAssign, SubAssign};
 
-use crate::metric::Sample;
+use crate::{c_api::cvec::CVec, metric::Sample};
 
 mod socket;
 mod cluster;
@@ -12,6 +12,7 @@ mod stat;
 
 pub use {socket::Socket, cluster::Cluster, core::Core, thread::Thread, capture::CpuCapture, die::Die};
 
+#[repr(C)]
 #[derive(Clone)]
 pub struct CPU {
   pub utilization: f64,
@@ -27,7 +28,7 @@ pub struct CPU {
   // Equivalent to /sys/devices/system/cpu/offline
   pub offline: f64,
   
-  pub sockets: Vec<Socket>
+  pub sockets: CVec<Socket>
 }
 
 impl CPU {

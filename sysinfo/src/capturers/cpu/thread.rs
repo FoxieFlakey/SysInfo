@@ -1,5 +1,6 @@
 use std::ops::{AddAssign, DivAssign, SubAssign};
 
+#[repr(C)]
 #[derive(Clone)]
 pub struct Thread {
   // Its normalized to 1.0-0.0 range,

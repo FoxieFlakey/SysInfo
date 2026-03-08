@@ -1,6 +1,6 @@
 use std::{fs::File, io::{BufRead, BufReader}, path::Path};
 
-use crate::{capturers::swap::{SwapDev, Swaps}, metric::Capturer};
+use crate::{c_api::cvec::CVec, capturers::swap::{SwapDev, Swaps}, metric::Capturer};
 
 pub struct SwapCapture;
 
@@ -31,7 +31,7 @@ impl Capturer for SwapCapture {
       }
     }
     
-    let mut devs = Vec::new();
+    let mut devs = CVec::new();
     for line in lines {
       let line = line.ok()?;
       let mut fields = line.split_ascii_whitespace();

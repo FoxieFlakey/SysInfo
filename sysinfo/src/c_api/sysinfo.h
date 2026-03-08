@@ -28,6 +28,18 @@ static inline const double* _Nullable maybe_double_get(const struct maybe_double
     return NULL;
 }
 
+#define SYSINFO_CVEC(T) \
+  struct { \
+    size_t cvec_length; \
+    size_t cvec_capacity; \
+    T* cvec_data; \
+  }
+
+#define sysinfo_cvec_len(this) ((self)->cvec_length)
+
+// Returns pointer to the entry
+#define sysinfo_cvec_index(this, idx) (&(self)->cvec_data[(idx)])
+
 // Get metric for a given resource
 struct sysinfo_memory {
   double mem_total_kib;

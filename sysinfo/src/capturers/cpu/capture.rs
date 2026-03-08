@@ -3,7 +3,7 @@ use std::{iter::Peekable, ops::Range, path::{Path, PathBuf}, time::Instant};
 use arrayvec::ArrayString;
 use indexmap::IndexMap;
 
-use crate::{capturers::cpu::{CPU, Cluster, Core, Die, Socket, Thread, stat::ProcStat}, metric::Capturer, util};
+use crate::{c_api::cvec::CVec, capturers::cpu::{CPU, Cluster, Core, Die, Socket, Thread, stat::ProcStat}, metric::Capturer, util};
 
 pub struct CpuCapture {
   prev_stat: Option<(Instant, ProcStat)>
@@ -96,7 +96,7 @@ impl Capturer for CpuCapture {
               Socket {
                 frequency_khz: 0.0,
                 utilization: 0.0,
-                dies: Vec::new()
+                dies: CVec::new()
               },
               IndexMap::new()
             )
@@ -108,7 +108,7 @@ impl Capturer for CpuCapture {
               Die {
                 frequency_khz: 0.0,
                 utilization: 0.0,
-                clusters: Vec::new()
+                clusters: CVec::new()
               },
               IndexMap::new()
             )
@@ -120,7 +120,7 @@ impl Capturer for CpuCapture {
               Cluster {
                 frequency_khz: 0.0,
                 utilization: 0.0,
-                cores: Vec::new()
+                cores: CVec::new()
               },
               IndexMap::new()
             )
@@ -132,7 +132,7 @@ impl Capturer for CpuCapture {
             Core {
               frequency_khz: 0.0,
               utilization: 0.0,
-              threads: Vec::new()
+              threads: CVec::new()
             }
           );
         
@@ -153,7 +153,7 @@ impl Capturer for CpuCapture {
       online: count_cpus(&online_cpus).into(),
       offline: count_cpus(&offline_cpus).into(),
       
-      sockets: Vec::new()
+      sockets: CVec::new()
     };
     
     // Lol, nests :3

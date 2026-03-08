@@ -1,12 +1,13 @@
 use std::ops::{AddAssign, DivAssign, SubAssign};
 
-use crate::capturers::cpu::Core;
+use crate::{c_api::cvec::CVec, capturers::cpu::Core};
 
+#[repr(C)]
 #[derive(Clone)]
 pub struct Cluster {
   pub utilization: f64,
   pub frequency_khz: f64,
-  pub cores: Vec<Core>
+  pub cores: CVec<Core>
 }
 
 impl Cluster {

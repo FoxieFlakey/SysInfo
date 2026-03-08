@@ -1,3 +1,6 @@
+#![feature(c_size_t)]
+#![feature(allocator_api)]
+
 mod metric;
 mod capturers;
 mod util;

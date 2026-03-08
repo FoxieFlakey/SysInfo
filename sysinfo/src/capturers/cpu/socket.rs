@@ -1,12 +1,13 @@
 use std::ops::{AddAssign, DivAssign, SubAssign};
 
-use crate::capturers::cpu::Die;
+use crate::{c_api::cvec::CVec, capturers::cpu::Die};
 
+#[repr(C)]
 #[derive(Clone)]
 pub struct Socket {
   pub utilization: f64,
   pub frequency_khz: f64,
-  pub dies: Vec<Die>
+  pub dies: CVec<Die>
 }
 
 impl Socket {
