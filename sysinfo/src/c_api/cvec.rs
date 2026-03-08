@@ -54,10 +54,6 @@ impl<T: Unpin> CVec<T> {
     }
     
     let new_capacity = if expected.is_power_of_two() { expected } else { expected.next_power_of_two() };
-    if new_capacity <= self.capacity {
-      return;
-    }
-    
     let old_layout = Layout::new::<T>()
       .repeat(usize::try_from(self.capacity).unwrap())
       .unwrap()
@@ -105,7 +101,18 @@ impl<T: Unpin> CVec<T> {
 
 impl<T: Clone + Unpin> Clone for CVec<T> {
   fn clone(&self) -> Self {
-    todo!();
+    let mut cloned = Self::new();
+    cloned.ensure_capacity(self.capacity);
+    
+    if let Some(src) = self.data {
+      let src = src.as_ptr().cast_const();
+      let dest = cloned.data.unwrap().as_ptr();
+      
+      unsafe { dest.copy_from_nonoverlapping(src, self.length); };
+    }
+    
+    cloned.length = self.length;
+    cloned
   }
 }
 

@@ -21,7 +21,9 @@ static _UNUSED: () = assert!(size_of::<c_char>() == 1, "You're on exotic platfor
 
 impl Clone for CString {
   fn clone(&self) -> Self {
-    todo!();
+    // SAFETY: CString always contains no NUL terminator inside it
+    // so 'new' will never return None
+    unsafe { Self::new(self.as_ascii_char()).unwrap_unchecked() }
   }
 }
 
@@ -61,6 +63,12 @@ impl CString {
       length,
       raw: bytes
     })
+  }
+  
+  pub fn as_ascii_char(&self) -> &[ascii::Char] {
+    // SAFETY: This CString will only strictly
+    // contains ASCII
+    unsafe { slice::from_raw_parts(self.raw.as_ptr().cast(), self.length) }
   }
   
   pub fn as_str(&self) -> &str {
