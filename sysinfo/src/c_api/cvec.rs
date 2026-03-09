@@ -105,10 +105,17 @@ impl<T: Clone + Unpin> Clone for CVec<T> {
     cloned.ensure_capacity(self.capacity);
     
     if let Some(src) = self.data {
-      let src = src.as_ptr().cast_const();
-      let dest = cloned.data.unwrap().as_ptr();
-      
-      unsafe { dest.copy_from_nonoverlapping(src, self.length); };
+      let dest = cloned.data.unwrap();
+      for i in 0..self.length {
+        // SAFETY: Already know the bound of the space by self.length
+        unsafe {
+          dest.add(i)
+            .write(src.add(i)
+            .as_ref()
+            .clone()
+          )
+        };
+      }
     }
     
     cloned.length = self.length;
