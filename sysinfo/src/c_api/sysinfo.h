@@ -7,9 +7,9 @@
 struct sysinfo;
 
 struct sysinfo* _Nonnull sysinfo_new();
-void sysinfo_free(struct sysinfo* _Nonnull this);
+void sysinfo_free(struct sysinfo* _Nonnull self);
 
-void sysinfo_update(struct sysinfo* _Nonnull this);
+void sysinfo_update(struct sysinfo* _Nonnull self);
 
 #define SYSINFO_COPTION_TEMPLATE(name, T) struct name { \
     _Bool coption_is_present; \
@@ -80,7 +80,7 @@ struct sysinfo_memory {
   struct sysinfo_maybe_double huge_page_size_kib;
 };
 
-const struct sysinfo_memory* _Nullable sysinfo_get_latest_memory_sample(const struct sysinfo* _Nonnull this);
+const struct sysinfo_memory* _Nullable sysinfo_get_latest_memory_sample(const struct sysinfo* _Nonnull self);
 
 // -------------------------------------------------
 // Swap metrics
@@ -100,15 +100,15 @@ struct sysinfo_swaps {
   struct sysinfo_swapdev_vec swapdevs;
 };
 
-const struct sysinfo_swaps* _Nullable sysinfo_get_latest_swap_sample(const struct sysinfo* _Nonnull this);
+const struct sysinfo_swaps* _Nullable sysinfo_get_latest_swap_sample(const struct sysinfo* _Nonnull self);
 
 // Convenience macros & funcs, users can directly use the fields information instead
 // doesn't have to use these macros for like C++ helper methods can avoids using
-// this macro and work on the data directly
+// self macro and work on the data directly
 
-#define sysinfo_coption_get(this) ((this)->coption_is_present ? &(this)->coption_data : NULL)
+#define sysinfo_coption_get(self) ((self)->coption_is_present ? &(self)->coption_data : NULL)
 
-#define sysinfo_cvec_len(this) ((this)->cvec_length)
+#define sysinfo_cvec_len(self) ((self)->cvec_length)
 
 // Returns pointer to the entry
 static inline void* _Nullable sysinfo_cvec_get_impl(size_t len, size_t index, size_t dataLen, void* _Nullable dataPtr) {
@@ -124,13 +124,13 @@ static inline void* _Nullable sysinfo_cvec_get_impl(size_t len, size_t index, si
 #define sysinfo_cvec_get(self, index) ((typeof((self)->cvec_data)) sysinfo_cvec_get_impl((self)->cvec_length, (index), sizeof(*(self)->cvec_data), (void*) (self)->cvec_data))
 
 __attribute__((unused))
-static inline size_t sysinfo_cstring_len(const struct sysinfo_cstring* _Nonnull this) {
-  return this->cstring_length;
+static inline size_t sysinfo_cstring_len(const struct sysinfo_cstring* _Nonnull self) {
+  return self->cstring_length;
 }
 
 __attribute__((unused))
-static inline const char* _Nonnull sysinfo_cstring_get(const struct sysinfo_cstring* _Nonnull this) {
-  return this->cstring_string;
+static inline const char* _Nonnull sysinfo_cstring_get(const struct sysinfo_cstring* _Nonnull self) {
+  return self->cstring_string;
 }
 
 #endif
