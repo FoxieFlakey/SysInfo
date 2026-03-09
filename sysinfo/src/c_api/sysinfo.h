@@ -158,6 +158,20 @@ struct sysinfo_cpu {
 
 const struct sysinfo_cpu* _Nullable sysinfo_get_latest_cpu_sample(const struct sysinfo* _Nonnull self);
 
+// -------------------------------------------------
+// Load avg metrics
+// -------------------------------------------------
+
+struct sysinfo_loadavg {
+  double load_1m;
+  double load_5m;
+  double load_15m;
+  double runnable_task_count;
+  double task_count;
+};
+
+const struct sysinfo_loadavg* _Nullable sysinfo_get_latest_loadavg_sample(const struct sysinfo* _Nonnull self);
+
 // Convenience macros & funcs, users can directly use the fields information instead
 // doesn't have to use these macros for like C++ helper methods can avoids using
 // self macro and work on the data directly

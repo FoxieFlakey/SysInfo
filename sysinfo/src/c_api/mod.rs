@@ -1,6 +1,6 @@
 use std::{ffi::c_void, ptr::NonNull};
 
-use crate::{SysInfo, capturers::{cpu::CPU, memory::Memory, swap::Swaps}, metric::{Capturer, Metric}};
+use crate::{SysInfo, capturers::{cpu::CPU, loadavg::LoadAvg, memory::Memory, swap::Swaps}, metric::{Capturer, Metric}};
 
 pub mod option;
 pub mod cvec;
@@ -48,5 +48,11 @@ pub unsafe extern "C" fn sysinfo_get_latest_swap_sample(this: *const c_void) -> 
 pub unsafe extern "C" fn sysinfo_get_latest_cpu_sample(this: *const c_void) -> Option<NonNull<CPU>> {
   let instance = unsafe { this.cast::<SysInfo>().as_ref().expect("C gave null pointer") };
   get_xxx_sample_impl(&instance.cpu_usage)
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sysinfo_get_latest_loadavg_sample(this: *const c_void) -> Option<NonNull<LoadAvg>> {
+  let instance = unsafe { this.cast::<SysInfo>().as_ref().expect("C gave null pointer") };
+  get_xxx_sample_impl(&instance.loadavg)
 }
 

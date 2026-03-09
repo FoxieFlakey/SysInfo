@@ -32,6 +32,12 @@ int main() {
     goto exit;
   }
   
+  const struct sysinfo_loadavg* loadavg = sysinfo_get_latest_loadavg_sample(sysinfo);
+  if (loadavg == NULL) {
+    fprintf(stderr, "ERROR: there is no recent loadavg sample\n");
+    goto exit;
+  }
+  
   printf("Utilization        : %5.2lf%%\n", sample->utilization * 100.0);
   printf("Frequency          : %5.2lf Mhz\n", sample->frequency_khz / 1000.0);
   printf("Present CPU count  : %5.2lf\n", sample->present);
@@ -136,6 +142,13 @@ int main() {
     printf("   Used: %8.2lf MiB\n", dev->used_kib / 1024.0);
     printf("   Size: %8.2lf MiB\n", dev->size_kib / 1024.0);
   }
+  
+  printf("System loadavg:\n");
+  printf("1  minute     : %8.2lf\n", loadavg->load_1m);
+  printf("5  minute     : %8.2lf\n", loadavg->load_5m);
+  printf("15 minute     : %8.2lf\n", loadavg->load_15m);
+  printf("Runnable tasks: %8.2lf tasks\n", loadavg->runnable_task_count);
+  printf("Task count    : %8.2lf tasks\n", loadavg->task_count);
 exit:
   sysinfo_free(sysinfo);
 }
