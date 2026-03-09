@@ -1,4 +1,4 @@
-use sysinfo::SysInfo;
+use sysinfo::{SysInfo, c_api::cvec::CVec};
 
 fn main() {
   let mut sysinfo = SysInfo::new();
@@ -45,6 +45,21 @@ fn main() {
         }
       }
     }
+  }
+  
+  let cores = sample.sockets
+    .iter()
+    .map(|x| CVec::iter(&x.dies))
+    .flatten()
+    .map(|x| CVec::iter(&x.clusters))
+    .flatten()
+    .map(|x| CVec::iter(&x.cores))
+    .flatten()
+    .collect::<Vec<_>>();
+  
+  println!("Simplified report: only the physical cores reported, not including hyperthreads if there any");
+  for (i, core) in cores.iter().enumerate() {
+    println!("CPU {i} {:6.2}f% usage @ {:6.2} Mhz", core.utilization * 100.0, core.frequency_khz / 1000.0);
   }
   
   println!("Swap in system:");
