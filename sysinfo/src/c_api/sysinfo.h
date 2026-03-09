@@ -16,19 +16,22 @@ void sysinfo_update(struct sysinfo* _Nonnull this);
     T coption_data; \
   }
 
-#define sysinfo_coption_get(this) ((this)->coption_is_present ? &(this)->coption_data : NULL)
-
 #define SYSINFO_CVEC_TEMPLATE(name, T) \
   struct name { \
     size_t cvec_length; \
     size_t cvec_capacity; \
-    T* cvec_data; \
+    T* _Nullable cvec_data; \
   }
 
-#define sysinfo_cvec_len(this) ((self)->cvec_length)
+struct sysinfo_cstring {
+  size_t cstring_length;
+  const char* _Nonnull cstring_string;
+};
 
-// Returns pointer to the entry
-#define sysinfo_cvec_index(this, idx) (&(self)->cvec_data[(idx)])
+
+// -------------------------------------------------
+// Memory metrics
+// -------------------------------------------------
 
 // Make the templates "real types"
 // must use these instead of via template macro
@@ -36,22 +39,6 @@ void sysinfo_update(struct sysinfo* _Nonnull this);
 // This way would allow C++ methods to be usable
 SYSINFO_COPTION_TEMPLATE(sysinfo_maybe_double, double);
 
-struct sysinfo_cstring {
-  size_t cstring_length;
-  const char* cstring_string;
-};
-
-__attribute__((unused))
-static inline size_t sysinfo_cstring_len(const struct sysinfo_cstring* this) {
-  return this->cstring_length;
-}
-
-__attribute__((unused))
-static inline const char* sysinfo_cstring_get(const struct sysinfo_cstring* this) {
-  return this->cstring_string;
-}
-
-// Get metric for a given resource
 struct sysinfo_memory {
   double mem_total_kib;
   double mem_free_kib;
@@ -93,6 +80,57 @@ struct sysinfo_memory {
   struct sysinfo_maybe_double huge_page_size_kib;
 };
 
-struct sysinfo_memory* _Nullable sysinfo_get_latest_memory_sample(const struct sysinfo* _Nonnull this);
+const struct sysinfo_memory* _Nullable sysinfo_get_latest_memory_sample(const struct sysinfo* _Nonnull this);
+
+// -------------------------------------------------
+// Swap metrics
+// -------------------------------------------------
+
+struct sysinfo_swapdev {
+  struct sysinfo_cstring path;
+  double size_kib;
+  double used_kib;
+};
+
+SYSINFO_CVEC_TEMPLATE(sysinfo_swapdev_vec, struct sysinfo_swapdev);
+
+struct sysinfo_swaps {
+  double total_size_kib;
+  double total_used_kib;
+  struct sysinfo_swapdev_vec swapdevs;
+};
+
+const struct sysinfo_swaps* _Nullable sysinfo_get_latest_swap_sample(const struct sysinfo* _Nonnull this);
+
+// Convenience macros & funcs, users can directly use the fields information instead
+// doesn't have to use these macros for like C++ helper methods can avoids using
+// this macro and work on the data directly
+
+#define sysinfo_coption_get(this) ((this)->coption_is_present ? &(this)->coption_data : NULL)
+
+#define sysinfo_cvec_len(this) ((this)->cvec_length)
+
+// Returns pointer to the entry
+static inline void* _Nullable sysinfo_cvec_get_impl(size_t len, size_t index, size_t dataLen, void* _Nullable dataPtr) {
+  if (index >= len)
+    return NULL;
+  
+  if (dataPtr == NULL)
+    return NULL;
+  
+  return ((char*) dataPtr) + dataLen * index;
+}
+
+#define sysinfo_cvec_get(self, index) ((typeof((self)->cvec_data)) sysinfo_cvec_get_impl((self)->cvec_length, (index), sizeof(*(self)->cvec_data), (void*) (self)->cvec_data))
+
+__attribute__((unused))
+static inline size_t sysinfo_cstring_len(const struct sysinfo_cstring* _Nonnull this) {
+  return this->cstring_length;
+}
+
+__attribute__((unused))
+static inline const char* _Nonnull sysinfo_cstring_get(const struct sysinfo_cstring* _Nonnull this) {
+  return this->cstring_string;
+}
 
 #endif

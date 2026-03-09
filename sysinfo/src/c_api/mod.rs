@@ -35,3 +35,15 @@ pub unsafe extern "C" fn sysinfo_get_latest_memory_sample(this: *const c_void) -
     .map(NonNull::cast)
 }
 
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sysinfo_get_latest_swap_sample(this: *const c_void) -> Option<NonNull<c_void>> {
+  let instance = unsafe { this.cast::<SysInfo>().as_ref().expect("C gave null pointer") };
+  instance.swap_usage
+    .data
+    .samples
+    .front()?
+    .as_ref()
+    .map(NonNull::from_ref)
+    .map(NonNull::cast)
+}
+

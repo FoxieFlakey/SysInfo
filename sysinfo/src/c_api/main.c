@@ -20,6 +20,12 @@ int main() {
     goto exit;
   }
   
+  const struct sysinfo_swaps* swap = sysinfo_get_latest_swap_sample(sysinfo);
+  if (memory == NULL) {
+    fprintf(stderr, "ERROR: there is no recent swap sample\n");
+    goto exit;
+  }
+  
   double used = (memory->mem_total_kib - memory->mem_free_kib) / 1024.0;
   double total = memory->mem_total_kib / 1024.0;
   double non_cache_or_buffer = used - (memory->buffers_kib + memory->cached_kib) / 1024.0;
@@ -71,6 +77,16 @@ int main() {
   print_opt("huge_pages_surplus_kib", &memory->huge_pages_surplus_kib);
   print_opt("huge_page_size_kib", &memory->huge_page_size_kib);
   
+  printf("Swap in system:\n");
+  printf("Total size: %8.2lf MiB\n", swap->total_size_kib / 1024.0);
+  printf("Total used: %8.2lf MiB\n", swap->total_used_kib / 1024.0);
+  printf("Swap devices:\n");
+  for (size_t i = 0; i < sysinfo_cvec_len(&swap->swapdevs); i++) {
+    const struct sysinfo_swapdev* dev = sysinfo_cvec_get(&swap->swapdevs, i);
+    printf(" - Swap at %s\n", sysinfo_cstring_get(&dev->path));
+    printf("   Used: %8.2lf MiB\n", dev->used_kib / 1024.0);
+    printf("   Size: %8.2lf MiB\n", dev->size_kib / 1024.0);
+  }
 exit:
   sysinfo_free(sysinfo);
 }

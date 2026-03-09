@@ -2,6 +2,7 @@ use std::ops::{AddAssign, DivAssign, SubAssign};
 
 use crate::c_api::cstring::CString;
 
+#[repr(C)]
 #[derive(Clone)]
 pub struct SwapDev {
   pub path: CString,
