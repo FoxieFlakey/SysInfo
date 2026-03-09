@@ -111,6 +111,7 @@ const struct sysinfo_swaps* _Nullable sysinfo_get_latest_swap_sample(const struc
 #define sysinfo_cvec_len(self) ((self)->cvec_length)
 
 // Returns pointer to the entry
+__attribute__((unused))
 static inline void* _Nullable sysinfo_cvec_get_impl(size_t len, size_t index, size_t dataLen, void* _Nullable dataPtr) {
   if (index >= len)
     return NULL;
