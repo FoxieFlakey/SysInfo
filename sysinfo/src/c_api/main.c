@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "sysinfo.h"
 
@@ -37,6 +38,8 @@ int main() {
     fprintf(stderr, "ERROR: there is no recent loadavg sample\n");
     goto exit;
   }
+  
+  size_t coreCount = 0;
   
   printf("Utilization        : %5.2lf%%\n", sample->utilization * 100.0);
   printf("Frequency          : %5.2lf Mhz\n", sample->frequency_khz / 1000.0);
@@ -77,9 +80,48 @@ int main() {
             printf("           Frequency   : %5.2lf Mhz\n", thread->frequency_khz / 1000.0);
           }
         }
+        
+        coreCount += sysinfo_cvec_len(&cluster->cores);
       }
     }
   }
+  
+  const struct sysinfo_cpu_core** cores = calloc(coreCount, sizeof(*cores));
+  if (!cores) {
+    printf("ERROR: Cannot allocate buffer to store list of cores\n");
+    goto exit;
+  }
+  
+  size_t currentIndex = 0;
+  for (size_t i = 0; i < sysinfo_cvec_len(&sample->sockets); i++) {
+    const struct sysinfo_cpu_socket* socket = sysinfo_cvec_get(&sample->sockets, i);
+    for (size_t i = 0; i < sysinfo_cvec_len(&socket->dies); i++) {
+      const struct sysinfo_cpu_die* die = sysinfo_cvec_get(&socket->dies, i);
+      for (size_t i = 0; i < sysinfo_cvec_len(&die->clusters); i++) {
+        const struct sysinfo_cpu_cluster* cluster = sysinfo_cvec_get(&die->clusters, i);
+        for (size_t i = 0; i < sysinfo_cvec_len(&cluster->cores); i++) {
+          const struct sysinfo_cpu_core* core = sysinfo_cvec_get(&cluster->cores, i);
+          
+          if (currentIndex >= coreCount) {
+            free(cores);
+            printf("ERROR: There suddenly new entry in amount of cores! (MUST NOT HAPPEN)\n");
+            goto exit;
+          }
+          
+          cores[currentIndex] = core;
+          currentIndex++;
+        }
+      }
+    }
+  }
+  
+  printf("Simplified report: only the physical cores reported, not including hyperthreads if there any\n");
+  for (size_t i = 0; i < coreCount; i++) {
+    const struct sysinfo_cpu_core* core = cores[i];
+    printf("CPU %zu %6.2lf%% usage @ %8.2lf Mhz\n", i, core->utilization * 100.0, core->frequency_khz / 1000.0);
+  }
+  
+  free(cores);
   
   double used = (memory->mem_total_kib - memory->mem_free_kib) / 1024.0;
   double total = memory->mem_total_kib / 1024.0;
