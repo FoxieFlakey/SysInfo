@@ -1,6 +1,6 @@
 use std::{ffi::c_void, ptr::NonNull};
 
-use crate::SysInfo;
+use crate::{SysInfo, capturers::{memory::Memory, swap::Swaps}, metric::{Capturer, Metric}};
 
 pub mod option;
 pub mod cvec;
@@ -23,11 +23,8 @@ pub unsafe extern "C" fn sysinfo_update(this: *mut c_void) {
   instance.update();
 }
 
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn sysinfo_get_latest_memory_sample(this: *const c_void) -> Option<NonNull<c_void>> {
-  let instance = unsafe { this.cast::<SysInfo>().as_ref().expect("C gave null pointer") };
-  instance.memory_usage
-    .data
+fn get_xxx_sample_impl<T: Capturer>(metric: &Metric<T>) -> Option<NonNull<T::Sample>> {
+  metric.data
     .samples
     .front()?
     .as_ref()
@@ -36,14 +33,14 @@ pub unsafe extern "C" fn sysinfo_get_latest_memory_sample(this: *const c_void) -
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn sysinfo_get_latest_swap_sample(this: *const c_void) -> Option<NonNull<c_void>> {
+pub unsafe extern "C" fn sysinfo_get_latest_memory_sample(this: *const c_void) -> Option<NonNull<Memory>> {
   let instance = unsafe { this.cast::<SysInfo>().as_ref().expect("C gave null pointer") };
-  instance.swap_usage
-    .data
-    .samples
-    .front()?
-    .as_ref()
-    .map(NonNull::from_ref)
-    .map(NonNull::cast)
+  get_xxx_sample_impl(&instance.memory_usage)
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sysinfo_get_latest_swap_sample(this: *const c_void) -> Option<NonNull<Swaps>> {
+  let instance = unsafe { this.cast::<SysInfo>().as_ref().expect("C gave null pointer") };
+  get_xxx_sample_impl(&instance.swap_usage)
 }
 
