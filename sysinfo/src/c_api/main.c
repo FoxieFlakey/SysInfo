@@ -41,43 +41,43 @@ int main() {
   
   size_t coreCount = 0;
   
-  printf("Utilization        : %5.2lf%%\n", sample->utilization * 100.0);
-  printf("Frequency          : %5.2lf Mhz\n", sample->frequency_khz / 1000.0);
-  printf("Present CPU count  : %5.2lf\n", sample->present);
-  printf("Possible CPU count : %5.2lf\n", sample->possible);
-  printf("Online CPU count   : %5.2lf\n", sample->online);
-  printf("Offline CPU count  : %5.2lf\n", sample->offline);
+  printf("Utilization        : %6.2lf%%\n", sample->utilization * 100.0);
+  printf("Frequency          : %6.2lf Mhz\n", sample->frequency_khz / 1000.0);
+  printf("Present CPU count  : %6.2lf\n", sample->present);
+  printf("Possible CPU count : %6.2lf\n", sample->possible);
+  printf("Online CPU count   : %6.2lf\n", sample->online);
+  printf("Offline CPU count  : %6.2lf\n", sample->offline);
   printf("Sockets:\n");
   for (size_t i = 0; i < sysinfo_cvec_len(&sample->sockets); i++) {
     const struct sysinfo_cpu_socket* socket = sysinfo_cvec_get(&sample->sockets, i);
     printf(" - Socket %zu\n", i);
-    printf("   Utilization : %5.2lf%%\n", socket->utilization * 100.0);
-    printf("   Frequency   : %5.2lf Mhz\n", socket->frequency_khz / 1000.0);
+    printf("   Utilization : %6.2lf%%\n", socket->utilization * 100.0);
+    printf("   Frequency   : %6.2lf Mhz\n", socket->frequency_khz / 1000.0);
     printf("   Clusters:\n");
     
     for (size_t i = 0; i < sysinfo_cvec_len(&socket->dies); i++) {
       const struct sysinfo_cpu_die* die = sysinfo_cvec_get(&socket->dies, i);
       printf("   - Die %zu\n", i);
-      printf("     Utilization : %5.2lf%%\n", die->utilization * 100.0);
-      printf("     Frequency   : %5.2lf Mhz\n", die->frequency_khz / 1000.0);
+      printf("     Utilization : %6.2lf%%\n", die->utilization * 100.0);
+      printf("     Frequency   : %6.2lf Mhz\n", die->frequency_khz / 1000.0);
       printf("     Clusters:\n");
       for (size_t i = 0; i < sysinfo_cvec_len(&die->clusters); i++) {
         const struct sysinfo_cpu_cluster* cluster = sysinfo_cvec_get(&die->clusters, i);
         printf("     - Cluster %zu\n", i);
-        printf("       Utilization : %5.2lf%%\n", cluster->utilization * 100.0);
-        printf("       Frequency   : %5.2lf Mhz\n", cluster->frequency_khz / 1000.0);
+        printf("       Utilization : %6.2lf%%\n", cluster->utilization * 100.0);
+        printf("       Frequency   : %6.2lf Mhz\n", cluster->frequency_khz / 1000.0);
         printf("       Cores:\n");
         for (size_t i = 0; i < sysinfo_cvec_len(&cluster->cores); i++) {
           const struct sysinfo_cpu_core* core = sysinfo_cvec_get(&cluster->cores, i);
           printf("       - Core %zu\n", i);
-          printf("         Utilization : %5.2lf%%\n", core->utilization * 100.0);
-          printf("         Frequency   : %5.2lf Mhz\n", core->frequency_khz / 1000.0);
+          printf("         Utilization : %6.2lf%%\n", core->utilization * 100.0);
+          printf("         Frequency   : %6.2lf Mhz\n", core->frequency_khz / 1000.0);
           printf("         Threads:\n");
           for (size_t i = 0; i < sysinfo_cvec_len(&core->threads); i++) {
             const struct sysinfo_cpu_thread* thread = sysinfo_cvec_get(&core->threads, i);
             printf("         - Thread %zu\n", i);
-            printf("           Utilization : %5.2lf%%\n", thread->utilization * 100.0);
-            printf("           Frequency   : %5.2lf Mhz\n", thread->frequency_khz / 1000.0);
+            printf("           Utilization : %6.2lf%%\n", thread->utilization * 100.0);
+            printf("           Frequency   : %6.2lf Mhz\n", thread->frequency_khz / 1000.0);
           }
         }
         
@@ -118,7 +118,7 @@ int main() {
   printf("Simplified report: only the physical cores reported, not including hyperthreads if there any\n");
   for (size_t i = 0; i < coreCount; i++) {
     const struct sysinfo_cpu_core* core = cores[i];
-    printf("CPU %zu %6.2lf%% usage @ %8.2lf Mhz\n", i, core->utilization * 100.0, core->frequency_khz / 1000.0);
+    printf("CPU %zu %6.2lf%% usage @ %6.2lf Mhz\n", i, core->utilization * 100.0, core->frequency_khz / 1000.0);
   }
   
   free(cores);
@@ -138,24 +138,24 @@ int main() {
   
   printf("This is same output as the one from Rust's test_uwu crate using same API but with C meow meow~ :3\n");
   
-  printf("Total memory      : %12.2lf MiB\n", total);
-  printf("Free              : %12.2lf MiB\n", free);
-  printf("Used              : %12.2lf MiB\n", used);
-  printf("Non cache/buffers : %12.2lf MiB\n", non_cache_or_buffer);
-  printf("Cached            : %12.2lf MiB\n", cached);
-  printf("Buffers           : %12.2lf MiB\n", buffers);
-  printf("Shmem             : %12.2lf MiB\n", shmem);
-  printf("Writeback         : %12.2lf MiB\n", writeback);
-  printf("Dirty             : %12.2lf MiB\n", dirty);
-  printf("Available         : %12.2lf MiB\n", available);
-  printf("File mapped       : %12.2lf MiB\n", mapped);
-  printf("Anonymous mem     : %12.2lf MiB\n", anonymous_memory);
+  printf("Total memory      : %13.2lf MiB\n", total);
+  printf("Free              : %13.2lf MiB\n", free);
+  printf("Used              : %13.2lf MiB\n", used);
+  printf("Non cache/buffers : %13.2lf MiB\n", non_cache_or_buffer);
+  printf("Cached            : %13.2lf MiB\n", cached);
+  printf("Buffers           : %13.2lf MiB\n", buffers);
+  printf("Shmem             : %13.2lf MiB\n", shmem);
+  printf("Writeback         : %13.2lf MiB\n", writeback);
+  printf("Dirty             : %13.2lf MiB\n", dirty);
+  printf("Available         : %13.2lf MiB\n", available);
+  printf("File mapped       : %13.2lf MiB\n", mapped);
+  printf("Anonymous mem     : %13.2lf MiB\n", anonymous_memory);
   
   printf("Simpler summary of memory state:\n");
-  printf("Used      : %12.2lf MiB\n", non_cache_or_buffer + shmem + buffers);
-  printf("Cache     : %12.2lf MiB\n", cached);
-  printf("Writeback : %12.2lf MiB (pending to written to disk)\n", writeback);
-  printf("Available : %12.2lf MiB\n", available);
+  printf("Used      : %13.2lf MiB\n", non_cache_or_buffer + shmem + buffers);
+  printf("Cache     : %13.2lf MiB\n", cached);
+  printf("Writeback : %13.2lf MiB (pending to written to disk)\n", writeback);
+  printf("Available : %13.2lf MiB\n", available);
   
   printf("\nOptional fields:\n");
   
@@ -175,22 +175,22 @@ int main() {
   print_opt("huge_page_size_kib", &memory->huge_page_size_kib);
   
   printf("Swap in system:\n");
-  printf("Total size: %8.2lf MiB\n", swap->total_size_kib / 1024.0);
-  printf("Total used: %8.2lf MiB\n", swap->total_used_kib / 1024.0);
+  printf("Total size: %9.2lf MiB\n", swap->total_size_kib / 1024.0);
+  printf("Total used: %9.2lf MiB\n", swap->total_used_kib / 1024.0);
   printf("Swap devices:\n");
   for (size_t i = 0; i < sysinfo_cvec_len(&swap->swapdevs); i++) {
     const struct sysinfo_swapdev* dev = sysinfo_cvec_get(&swap->swapdevs, i);
     printf(" - Swap at %s\n", sysinfo_cstring_get(&dev->path));
-    printf("   Used: %8.2lf MiB\n", dev->used_kib / 1024.0);
-    printf("   Size: %8.2lf MiB\n", dev->size_kib / 1024.0);
+    printf("   Used: %9.2lf MiB\n", dev->used_kib / 1024.0);
+    printf("   Size: %9.2lf MiB\n", dev->size_kib / 1024.0);
   }
   
   printf("System loadavg:\n");
-  printf("1  minute     : %8.2lf\n", loadavg->load_1m);
-  printf("5  minute     : %8.2lf\n", loadavg->load_5m);
-  printf("15 minute     : %8.2lf\n", loadavg->load_15m);
-  printf("Runnable tasks: %8.2lf tasks\n", loadavg->runnable_task_count);
-  printf("Task count    : %8.2lf tasks\n", loadavg->task_count);
+  printf("1  minute     : %9.2lf\n", loadavg->load_1m);
+  printf("5  minute     : %9.2lf\n", loadavg->load_5m);
+  printf("15 minute     : %9.2lf\n", loadavg->load_15m);
+  printf("Runnable tasks: %9.2lf tasks\n", loadavg->runnable_task_count);
+  printf("Task count    : %9.2lf tasks\n", loadavg->task_count);
 exit:
   sysinfo_free(sysinfo);
 }
