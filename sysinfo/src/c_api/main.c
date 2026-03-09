@@ -14,6 +14,12 @@ int main() {
   struct sysinfo* sysinfo = sysinfo_new();
   sysinfo_update(sysinfo);
   
+  const struct sysinfo_cpu* sample = sysinfo_get_latest_cpu_sample(sysinfo);
+  if (sample == NULL) {
+    fprintf(stderr, "ERROR: there is no recent cpu sample\n");
+    goto exit;
+  }
+  
   const struct sysinfo_memory* memory = sysinfo_get_latest_memory_sample(sysinfo);
   if (memory == NULL) {
     fprintf(stderr, "ERROR: there is no recent memory sample\n");
@@ -21,9 +27,52 @@ int main() {
   }
   
   const struct sysinfo_swaps* swap = sysinfo_get_latest_swap_sample(sysinfo);
-  if (memory == NULL) {
+  if (swap == NULL) {
     fprintf(stderr, "ERROR: there is no recent swap sample\n");
     goto exit;
+  }
+  
+  printf("Utilization        : %5.2lf%%\n", sample->utilization * 100.0);
+  printf("Frequency          : %5.2lf Mhz\n", sample->frequency_khz / 1000.0);
+  printf("Present CPU count  : %5.2lf\n", sample->present);
+  printf("Possible CPU count : %5.2lf\n", sample->possible);
+  printf("Online CPU count   : %5.2lf\n", sample->online);
+  printf("Offline CPU count  : %5.2lf\n", sample->offline);
+  printf("Sockets:\n");
+  for (size_t i = 0; i < sysinfo_cvec_len(&sample->sockets); i++) {
+    const struct sysinfo_cpu_socket* socket = sysinfo_cvec_get(&sample->sockets, i);
+    printf(" - Socket %zu\n", i);
+    printf("   Utilization : %5.2lf%%\n", socket->utilization * 100.0);
+    printf("   Frequency   : %5.2lf Mhz\n", socket->frequency_khz / 1000.0);
+    printf("   Clusters:\n");
+    
+    for (size_t i = 0; i < sysinfo_cvec_len(&socket->dies); i++) {
+      const struct sysinfo_cpu_die* die = sysinfo_cvec_get(&socket->dies, i);
+      printf("   - Die %zu\n", i);
+      printf("     Utilization : %5.2lf%%\n", die->utilization * 100.0);
+      printf("     Frequency   : %5.2lf Mhz\n", die->frequency_khz / 1000.0);
+      printf("     Clusters:\n");
+      for (size_t i = 0; i < sysinfo_cvec_len(&die->clusters); i++) {
+        const struct sysinfo_cpu_cluster* cluster = sysinfo_cvec_get(&die->clusters, i);
+        printf("     - Cluster %zu\n", i);
+        printf("       Utilization : %5.2lf%%\n", cluster->utilization * 100.0);
+        printf("       Frequency   : %5.2lf Mhz\n", cluster->frequency_khz / 1000.0);
+        printf("       Cores:\n");
+        for (size_t i = 0; i < sysinfo_cvec_len(&cluster->cores); i++) {
+          const struct sysinfo_cpu_core* core = sysinfo_cvec_get(&cluster->cores, i);
+          printf("       - Core %zu\n", i);
+          printf("         Utilization : %5.2lf%%\n", core->utilization * 100.0);
+          printf("         Frequency   : %5.2lf Mhz\n", core->frequency_khz / 1000.0);
+          printf("         Threads:\n");
+          for (size_t i = 0; i < sysinfo_cvec_len(&core->threads); i++) {
+            const struct sysinfo_cpu_thread* thread = sysinfo_cvec_get(&core->threads, i);
+            printf("         - Thread %zu\n", i);
+            printf("           Utilization : %5.2lf%%\n", thread->utilization * 100.0);
+            printf("           Frequency   : %5.2lf Mhz\n", thread->frequency_khz / 1000.0);
+          }
+        }
+      }
+    }
   }
   
   double used = (memory->mem_total_kib - memory->mem_free_kib) / 1024.0;

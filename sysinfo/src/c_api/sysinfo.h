@@ -102,6 +102,62 @@ struct sysinfo_swaps {
 
 const struct sysinfo_swaps* _Nullable sysinfo_get_latest_swap_sample(const struct sysinfo* _Nonnull self);
 
+// -------------------------------------------------
+// CPU metrics
+// -------------------------------------------------
+
+struct sysinfo_cpu_thread {
+  double online_percent;
+  double utilization;
+  double frequency_khz;
+};
+
+SYSINFO_CVEC_TEMPLATE(sysinfo_cpu_thread_vec, struct sysinfo_cpu_thread);
+
+struct sysinfo_cpu_core {
+  double utilization;
+  double frequency_khz;
+  struct sysinfo_cpu_thread_vec threads;
+};
+
+SYSINFO_CVEC_TEMPLATE(sysinfo_cpu_core_vec, struct sysinfo_cpu_core);
+
+struct sysinfo_cpu_cluster {
+  double utilization;
+  double frequency_khz;
+  struct sysinfo_cpu_core_vec cores;
+};
+
+SYSINFO_CVEC_TEMPLATE(sysinfo_cpu_cluster_vec, struct sysinfo_cpu_cluster);
+
+struct sysinfo_cpu_die {
+  double utilization;
+  double frequency_khz;
+  struct sysinfo_cpu_cluster_vec clusters;
+};
+
+SYSINFO_CVEC_TEMPLATE(sysinfo_cpu_die_vec, struct sysinfo_cpu_die);
+
+struct sysinfo_cpu_socket {
+  double utilization;
+  double frequency_khz;
+  struct sysinfo_cpu_die_vec dies;
+};
+
+SYSINFO_CVEC_TEMPLATE(sysinfo_cpu_socket_vec, struct sysinfo_cpu_socket);
+
+struct sysinfo_cpu {
+  double utilization;
+  double frequency_khz;
+  double present;
+  double possible;
+  double online;
+  double offline;
+  struct sysinfo_cpu_socket_vec sockets;
+};
+
+const struct sysinfo_cpu* _Nullable sysinfo_get_latest_cpu_sample(const struct sysinfo* _Nonnull self);
+
 // Convenience macros & funcs, users can directly use the fields information instead
 // doesn't have to use these macros for like C++ helper methods can avoids using
 // self macro and work on the data directly
