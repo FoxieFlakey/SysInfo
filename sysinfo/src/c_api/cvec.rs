@@ -102,7 +102,7 @@ impl<T: Unpin> CVec<T> {
 impl<T: Clone + Unpin> Clone for CVec<T> {
   fn clone(&self) -> Self {
     let mut cloned = Self::new();
-    cloned.ensure_capacity(self.capacity);
+    cloned.ensure_capacity(self.length);
     
     if let Some(src) = self.data {
       let dest = cloned.data.unwrap();
