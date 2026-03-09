@@ -86,7 +86,7 @@ impl<T> COption<T> {
     }
   }
   
-  fn into_opt(mut self) -> Option<T> {
+  pub fn into_opt(mut self) -> Option<T> {
     if self.is_present {
       // Ensure drop doesn't trigger
       // we already moved out data in there

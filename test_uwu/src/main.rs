@@ -1,4 +1,4 @@
-use sysinfo::{SysInfo, c_api::cvec::CVec};
+use sysinfo::{SysInfo, c_api::{cvec::CVec, option::COption}};
 
 fn main() {
   let mut sysinfo = SysInfo::new();
@@ -104,6 +104,28 @@ fn main() {
   println!("Cache     : {:13.2} MiB", cached);
   println!("Writeback : {:13.2} MiB (pending to written to disk)", writeback);
   println!("Available : {:13.2} MiB", available);
+  
+  fn print_opt(name: &str, opt: &COption<f64>) {
+    match opt.as_ref().into_opt() {
+      Some(x) => println!("Field '{name}' present with {x:.2} MiB"),
+      None => println!("Field '{name}' not present")
+    }
+  }
+  
+  print_opt("lazy_free_kib", &memory.lazy_free_kib);
+  print_opt("direct_map_4k_kib", &memory.direct_map_4k_kib);
+  print_opt("direct_map_2m_kib", &memory.direct_map_2m_kib);
+  print_opt("direct_map_4m_kib", &memory.direct_map_4m_kib);
+  print_opt("direct_map_1g_kib", &memory.direct_map_1g_kib);
+  print_opt("hardware_corrupted_kib", &memory.hardware_corrupted_kib);
+  print_opt("anon_huge_pages_kib", &memory.anon_huge_pages_kib);
+  print_opt("shmem_huge_pages_kib", &memory.shmem_huge_pages_kib);
+  print_opt("shmem_mapped_huge_pages_kib", &memory.shmem_mapped_huge_pages_kib);
+  print_opt("huge_pages_total_kib", &memory.huge_pages_total_kib);
+  print_opt("huge_pages_free_kib", &memory.huge_pages_free_kib);
+  print_opt("huge_pages_reserved_kib", &memory.huge_pages_reserved_kib);
+  print_opt("huge_pages_surplus_kib", &memory.huge_pages_surplus_kib);
+  print_opt("huge_page_size_kib", &memory.huge_page_size_kib);
   
   println!("System loadavg:");
   println!("1  minute     : {:9.2}", loadavg.load_1m);
